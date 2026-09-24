@@ -50,7 +50,7 @@ def main():
 
     expected_kernel_size = sum(x.stat().st_size for x in parts)
     assert a.payload.stat().st_size == expected_kernel_size
-    if HEADER_PAGE + ((expected_kernel_size + 4095) // 4096) * 4096 > MAX_BOOT_IMAGE:
+    if HEADER_PAGE + ((expected_kernel_size + 4095) // 4096) * 4096 + 4096 > MAX_BOOT_IMAGE:
         raise ValueError("combined image exceeds 64 MiB preliminary size limit")
 
     with a.payload.open("rb") as payload:
@@ -74,8 +74,16 @@ def main():
         assert ramdisk_size == 0, "unexpected ramdisk in experimental image"
         assert kernel_size == expected_kernel_size, "kernel size mismatch"
 
-    expected_img_size = HEADER_PAGE + ((kernel_size + 4095) // 4096) * 4096
+    # The in-tree mkbootimg.py appends a 4096-byte GKI boot signature
+    # placeholder even when no signing key is provided. It contains zeros,
+    # not an authenticated signature; this does NOT establish AVB trust.
+    sig_size = struct.unpack_from("<I", header, 1580)[0]
+    assert sig_size == 4096, "unexpected v4 signature-section size"
+    expected_img_size = HEADER_PAGE + ((kernel_size + 4095) // 4096) * 4096 + sig_size
     assert a.image.stat().st_size == expected_img_size, "boot image size mismatch"
+    with a.image.open("rb") as img:
+        img.seek(expected_img_size - sig_size)
+        assert img.read(sig_size) == bytes(sig_size), "unsigned placeholder differs"
     payload_sha = sha256_file(a.payload)
     image_kernel_sha = sha256_file(a.image, HEADER_PAGE, kernel_size)
     assert image_kernel_sha == payload_sha, "packaged payload SHA256 mismatch"
@@ -85,6 +93,8 @@ def main():
         "device_target": "Pixel Watch 2 (aurora) EXPERIMENTAL",
         "HARDWARE_TESTED": False,
         "SAFE_TO_FLASH": False,
+        "AVB_VERIFIED": False,
+        "GKI_BOOT_SIGNATURE": "4096-byte ZERO placeholder (NOT SIGNED)",
         "BOOTSTRAP_PROVENANCE": "inherited WOA-Project Watch3 build asset, not verified for Watch2",
         "BOOTSHIM_MEMORY_RELOCATION_VERIFIED_FOR_WATCH2": False,
         "ACPI_AND_FDF_VERIFIED_FOR_WATCH2": False,
@@ -97,7 +107,7 @@ def main():
         "component_sha256": {x.name: sha256_file(x) for x in parts},
         "checks": ["ARM64 BootShim header", "inherited FD size",
                    "Android boot v4 header", "exact component concat",
-                   "packaged payload SHA256", "64MiB preliminary size limit"]
+                   "packaged payload SHA256", "empty GKI signature placeholder", "64MiB preliminary size limit"]
     }
     a.manifest.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(f"PASS: {a.image.name} validated structurally; NOT HARDWARE VERIFIED")

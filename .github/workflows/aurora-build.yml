@@ -27,6 +27,11 @@ jobs:
         with:
           submodules: false
 
+      - name: Check packaging source syntax before expensive build
+        run: |
+          bash -n build_fd_aurora.sh build_bootshim_aurora.sh build_uefi_aurora.sh
+          python3 -m py_compile tools/validate_aurora_bootimg.py
+
       - name: Install host dependencies
         run: |
           sudo apt-get update

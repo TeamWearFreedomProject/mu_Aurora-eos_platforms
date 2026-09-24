@@ -49,3 +49,7 @@ These image files are research artifacts ONLY. **DO NOT FLASH THEM and DO NOT
 attempt a temporary boot** until the actual Pixel Watch 2 memory map,
 bootloader behavior, exact firmware compatibility and recovery method are
 confirmed and reviewed.
+
+The AOSP-compatible mkbootimg script here appends a **4096-byte zero-filled
+GKI boot signature placeholder** to each v4 image. This is not a signed boot
+image and does **not** satisfy AVB verification.
