@@ -1,0 +1,94 @@
+{
+  "description": "Historical fixed regions from early PW2 DTS; NOT current Aurora LTE firmware evidence.",
+  "source_url": "https://github.com/argosphil/aurora/blob/e3d5fc73b4c97ea19ae5a0fd1d4eee1324703ad0/extracted/dts",
+  "source_commit": "e3d5fc73b4c97ea19ae5a0fd1d4eee1324703ad0",
+  "source_date": "2023-11-11",
+  "variant_warning": "Upstream README calls its project WiFi and is uncertain of aurora/eos code names; verify against the precise LTE firmware.",
+  "fixed_regions": [
+    {
+      "name": "ODA",
+      "start": "0x45700000",
+      "length": "0x300000"
+    },
+    {
+      "name": "deep sleep",
+      "start": "0x45a00000",
+      "length": "0x100000"
+    },
+    {
+      "name": "HYP",
+      "start": "0x45b00000",
+      "length": "0x300000"
+    },
+    {
+      "name": "XBL/AOP",
+      "start": "0x45e00000",
+      "length": "0x11b000"
+    },
+    {
+      "name": "SEC apps",
+      "start": "0x45fff000",
+      "length": "0x1000"
+    },
+    {
+      "name": "SMEM",
+      "start": "0x46000000",
+      "length": "0x200000"
+    },
+    {
+      "name": "WLAN MSA",
+      "start": "0x46200000",
+      "length": "0x100000"
+    },
+    {
+      "name": "modem",
+      "start": "0x4ab00000",
+      "length": "0x5e00000"
+    },
+    {
+      "name": "video",
+      "start": "0x50900000",
+      "length": "0x700000"
+    },
+    {
+      "name": "ADSP",
+      "start": "0x51000000",
+      "length": "0x1900000"
+    },
+    {
+      "name": "IPA firmware",
+      "start": "0x52900000",
+      "length": "0x10000"
+    },
+    {
+      "name": "IPA GSI",
+      "start": "0x52910000",
+      "length": "0x5000"
+    },
+    {
+      "name": "GPU",
+      "start": "0x52915000",
+      "length": "0x2000"
+    },
+    {
+      "name": "continuous splash",
+      "start": "0x5c000000",
+      "length": "0xf00000"
+    },
+    {
+      "name": "DFPS data",
+      "start": "0x5cf00000",
+      "length": "0x100000"
+    },
+    {
+      "name": "TZ statistics",
+      "start": "0x60000000",
+      "length": "0x100000"
+    },
+    {
+      "name": "removed/PIMEM",
+      "start": "0x60100000",
+      "length": "0x1e00000"
+    }
+  ]
+}

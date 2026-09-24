@@ -1,6 +1,6 @@
 # Pixel Watch 2 (Aurora) UEFI bring-up
 
-This is an experimental, **build-only** starting point copied from the Pixel Watch 3 Selene platform.
+This is an experimental research-only platform derived from Pixel Watch 3 Selene. Compilation and image structure have been checked; live Aurora LTE bootability has not.
 
 - Display geometry: 384x384 (Aurora panel configuration).
 - Platform product / SMBIOS identity: aurora / Aurora.
@@ -8,8 +8,8 @@ This is an experimental, **build-only** starting point copied from the Pixel Wat
 - The `AuroraPkg.dec` package declaration is required by the upstream EDK2
   DebugMacroCheck pre-build plugin; omitting it causes `Path(None)` during
   package discovery.
-- **Temporary**: uses Selene's FDF and ACPI components, pending Aurora-specific device verification.
-- **Unverified**: RAM carve-outs, framebuffer address, GPIO/button wiring, UEFI relocation, bootshim and firmware dependencies.
+- Dedicated Aurora FDF, memory-map library and ACPI package now exist. FDF addresses, Qualcomm drivers and precompiled ACPI AML still inherit unverified Selene/PW3 assumptions.
+- **Unverified**: current firmware/SMEM memory reservations, runtime framebuffer mapping, GPIO/button wiring, UEFI relocation, BootShim and remaining firmware dependencies.
 - Successful compilation **does not imply** the image is safe to boot on real hardware.
 
 Never write the generated images to persistent partitions. Before any future temporary boot test,
@@ -53,3 +53,34 @@ confirmed and reviewed.
 The AOSP-compatible mkbootimg script here appends a **4096-byte zero-filled
 GKI boot signature placeholder** to each v4 image. This is not a signed boot
 image and does **not** satisfy AVB verification.
+
+## Preliminary Aurora memory and ACPI audit (historical source only)
+
+An [early extracted PW2 DTS](https://github.com/argosphil/aurora/blob/e3d5fc73b4c97ea19ae5a0fd1d4eee1324703ad0/extracted/dts)
+dated November 2023 shows ODA (0x45700000–0x45A00000), deep sleep
+(0x45A00000–0x45B00000), HYP (0x45B00000–0x45E00000), and an XBL/AOP
+reservation starting at 0x45E00000. It also exposes WLAN MSA at
+0x46200000–0x46300000, a 15 MiB splash framebuffer from 0x5C000000,
+and a 1 MiB DFPS region from 0x5CF00000.
+
+The new Aurora-specific memory library reflects these early **fixed**
+reservations, conservatively retains the original PIL range for the modem,
+video, ADSP, IPA and GPU areas, and keeps unverified remaining regions
+as inherited from Selene. A static CI audit guards 17 historical ranges
+against accidental assignment to allocatable RAM. This does **not**
+validate the 2026 Aurora LTE memory layout: the source README itself
+labels its device WiFi and is unsure of device codename mapping. Its
+dynamic DMA pools have no guaranteed fixed addresses.
+
+The Aurora-local FDF and ACPI package are now separate from Selene,
+but the FADT reset register and the precompiled SelunaACPI AML are
+**still inherited** and cannot be considered Watch 2 drivers. The
+UEFI/BootShim relocation address 0x5FC41000 and UEFI stack remain
+unverified against the watch's current bootloader; current `.img`
+output is still **DO NOT FLASH / DO NOT TEMPORARILY BOOT**.
+
+To make hardware progress, obtain the *exact target firmware's*
+bootloader/DTB memory layout and the matching Qualcomm memory
+partition/SMEM data, then port display, GPIO, interrupts and I2C
+ACPI device entries independently. Keep partition backups and a
+known working recovery path before any hardware bring-up.

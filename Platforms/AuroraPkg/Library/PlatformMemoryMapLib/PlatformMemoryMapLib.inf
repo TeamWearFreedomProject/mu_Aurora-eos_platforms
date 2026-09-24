@@ -1,0 +1,20 @@
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformMemoryMapLib
+  FILE_GUID                      = 764bfe64-e23f-4e18-b301-09160a321a4b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformMemoryMapLib
+
+[Sources]
+  PlatformMemoryMapLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  SelunaPkg/SelunaPkg.dec
+
+[LibraryClasses]
+  BaseLib

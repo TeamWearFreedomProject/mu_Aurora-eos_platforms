@@ -16,6 +16,8 @@ on:
       - 'build_bootshim_aurora.sh'
       - 'build_uefi_aurora.sh'
       - 'tools/validate_aurora_bootimg.py'
+      - 'tools/check_aurora_memorymap.py'
+      - 'tools/test_aurora_memorymap.py'
       - '.github/workflows/aurora-build.yml'
 
 jobs:
@@ -30,7 +32,9 @@ jobs:
       - name: Check packaging source syntax before expensive build
         run: |
           bash -n build_fd_aurora.sh build_bootshim_aurora.sh build_uefi_aurora.sh
-          python3 -m py_compile tools/validate_aurora_bootimg.py
+          python3 -m py_compile tools/validate_aurora_bootimg.py tools/check_aurora_memorymap.py
+          python3 tools/check_aurora_memorymap.py
+          python3 -m unittest discover -s tools -p 'test_aurora_memorymap.py' -v
 
       - name: Install host dependencies
         run: |

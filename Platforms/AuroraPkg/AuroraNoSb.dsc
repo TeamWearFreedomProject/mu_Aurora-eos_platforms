@@ -23,7 +23,7 @@
   SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = SelenePkg/Selene.fdf # temporary reuse; Aurora-specific FDF pending hardware validation
+  FLASH_DEFINITION               = AuroraPkg/Aurora.fdf # same unverified size and base as Selene
   SECURE_BOOT                    = 0
   USE_PHYSICAL_TIMER             = 0
   USE_SCREEN_FOR_SERIAL_OUTPUT   = 0
@@ -84,9 +84,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|48 # 384 / EFI_GLYPH_WIDTH(8)
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|20 # floor(384 / EFI_GLYPH_HEIGHT(19))
 
-!include QcomPkg/QcomPkg.dsc.inc
+!include AuroraPkg/AuroraQcom.dsc.inc
 !include SelunaPkg/Seluna.dsc.inc
 !include SelunaPkg/Frontpage.dsc.inc
 
 [Components.common]
-  SelenePkg/AcpiTables/AcpiTables.inf
+  AuroraPkg/AcpiTables/AcpiTables.inf
