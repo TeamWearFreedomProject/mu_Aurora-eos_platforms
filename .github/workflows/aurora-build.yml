@@ -1,0 +1,36 @@
+name: Aurora UEFI (experimental compile only)
+on:
+  workflow_dispatch:
+  push:
+    branches: ['Aurora&eos-port']
+    paths:
+      - 'Platforms/AuroraPkg/**'
+      - 'build_fd_aurora.sh'
+      - '.github/workflows/aurora-build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+      - name: Host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y uuid-dev clang llvm lld gcc-aarch64-linux-gnu mono-devel build-essential python3-pip python3-venv
+      - name: Set up Python dependencies
+        run: |
+          python3 -m pip install --break-system-packages -r pip-requirements.txt
+      - name: Initialize upstream build dependencies
+        run: |
+          python3 Platforms/AuroraPkg/PlatformBuild.py --setup -t RELEASE
+          python3 Platforms/AuroraPkg/PlatformBuild.py --update -t RELEASE
+      - name: Compile Aurora firmware volumes
+        run: bash ./build_fd_aurora.sh
+      - name: Publish compiled firmware volumes (NOT FLASH-READY)
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-uefi-unverified-fd
+          path: ImageResources/Aurora/*.fd
