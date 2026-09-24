@@ -5,6 +5,7 @@ on:
     branches: ['Aurora&eos-port']
     paths:
       - 'Platforms/AuroraPkg/**'
+      - 'Platforms/QcomModulePkg/**'
       - 'build_fd_aurora.sh'
       - '.github/workflows/aurora-build.yml'
 
