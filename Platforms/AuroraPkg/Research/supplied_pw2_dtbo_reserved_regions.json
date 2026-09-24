@@ -1,0 +1,46 @@
+{
+  "source_description": "User-supplied Pixel Watch 2 dtbo.img binary; raw firmware not included in repository",
+  "dtbo_sha256": "1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85",
+  "boot_uploaded_alongside_sha256": "a6538bca72bbc91a910b923be08126f70915f5ffef942a0ea1fcc8fcc3e5bb3d",
+  "accompanying_boot_fingerprint": "CP1A.260305.014.W2 (found in separately supplied boot.img; precise DTBO OTA provenance unverified)",
+  "dtbo_entry_count": 11,
+  "observed_overlays_with_identical_fixed_overrides": 11,
+  "variants": [
+    "Eos (board-ID family 0x204xx)",
+    "Aurora (board-ID family 0x205xx)"
+  ],
+  "scope": "Six fixed reg properties in /fragment@reserved-memory/__overlay__ across every DTBO entry; these are overlays, NOT the complete effective bootloader memory map.",
+  "parsing_note": "Use reg cells, not node suffixes. Three IPA/GPU nodes contain stale @547xxxxx suffixes, while reg is 0x549xxxxx.",
+  "fixed_regions": [
+    {
+      "name": "modem region",
+      "start": "0x4ab00000",
+      "length": "0x7e00000"
+    },
+    {
+      "name": "video region",
+      "start": "0x52900000",
+      "length": "0x700000"
+    },
+    {
+      "name": "ADSP region",
+      "start": "0x53000000",
+      "length": "0x1900000"
+    },
+    {
+      "name": "IPA firmware",
+      "start": "0x54900000",
+      "length": "0x10000"
+    },
+    {
+      "name": "IPA GSI",
+      "start": "0x54910000",
+      "length": "0x5000"
+    },
+    {
+      "name": "GPU",
+      "start": "0x54915000",
+      "length": "0x2000"
+    }
+  ]
+}

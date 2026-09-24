@@ -84,3 +84,31 @@ bootloader/DTB memory layout and the matching Qualcomm memory
 partition/SMEM data, then port display, GPIO, interrupts and I2C
 ACPI device entries independently. Keep partition backups and a
 known working recovery path before any hardware bring-up.
+
+## Comparison with the supplied newer Watch 2 DTBO (2026 upload)
+
+An uploaded 8 MiB Watch 2 `dtbo.img` (SHA-256:
+`1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85`)
+was read offline without modifying the watch. All 11 overlays, for Eos
+and Aurora board-ID families, have **identical six fixed memory reservation
+overrides**. The boot image supplied alongside it contains fingerprint
+`CP1A.260305.014.W2`, but their shared OTA provenance was not
+independently established. No original firmware binaries are committed.
+
+The supplied DTBO extends the modem reservation from the early DTS's
+`0x4AB00000..0x50900000` to `0x4AB00000..0x52900000`. Video moves
+to `0x52900000..0x53000000`, ADSP to
+`0x53000000..0x54900000`, and IPA/GPU regions occupy
+`0x54900000..0x54917000`. Some DTBO node names still mention
+`@547xxxxx`; the actual `reg` properties are at `0x549xxxxx`.
+The existing Aurora `PIL Reserved` span
+`0x4AB00000..0x55700000` **already covers both layouts**, so
+we preserve that broad reservation, rather than shifting allocations
+based on incomplete data. The CI checker now guards the six newer
+fixed overrides in addition to the 17 older fixed regions.
+
+**Still unknown:** The DTBO contains overrides, not the complete
+effective base DTB. It does not establish where `bootstrap.bin`,
+BootShim, the UEFI FD at `0x5FC41000`, the UEFI stack, or other
+bootloader/SMEM allocations can safely reside. None of these
+new checks makes the experimental image boot-ready.

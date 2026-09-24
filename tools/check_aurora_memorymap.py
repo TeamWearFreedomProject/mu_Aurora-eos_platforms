@@ -9,6 +9,9 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 MAP = ROOT / "Platforms/AuroraPkg/Library/PlatformMemoryMapLib/PlatformMemoryMapLib.c"
 FIXTURE = ROOT / "Platforms/AuroraPkg/Research/early_pw2_reserved_regions.json"
+RECENT_DTBO_FIXTURE = ROOT / "Platforms/AuroraPkg/Research/supplied_pw2_dtbo_reserved_regions.json"
+# The newer fixture records *only* the six fixed overrides in dtbo.img.
+# Base DTB, SMEM partitions, dynamic DMA pools and live mappings are unknown.
 ENTRY = re.compile(
     r'^\s*\{\s*"(?P<name>[^"]+)"\s*,\s*'
     r'(?P<start>0x[0-9a-fA-F]+)\s*,\s*(?P<length>0x[0-9a-fA-F]+)\s*,\s*'
@@ -30,8 +33,21 @@ def parse(text: str):
 
 def verify(text: str, data: dict):
     entries = parse(text)
-    if data.get("source_commit") != "e3d5fc73b4c97ea19ae5a0fd1d4eee1324703ad0":
-        raise ValueError("historical source revision changed without review")
+    if "source_commit" in data:
+        if data["source_commit"] != "e3d5fc73b4c97ea19ae5a0fd1d4eee1324703ad0":
+            raise ValueError("historical source revision changed without review")
+        required = 17
+        source_label = "historical DTS"
+    elif "dtbo_sha256" in data:
+        if data["dtbo_sha256"] != "1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85":
+            raise ValueError("supplied DTBO provenance changed without review")
+        if (data.get("dtbo_entry_count") != 11 or
+                data.get("observed_overlays_with_identical_fixed_overrides") != 11):
+            raise ValueError("unexpected DTBO overlay evidence")
+        required = 6
+        source_label = "supplied Watch 2 DTBO fixed overrides"
+    else:
+        raise ValueError("unknown fixed-region fixture source")
     protected = sorted(
         (e for e in entries if e["kind"] == "Reserv" and
          e["resource"] in ("MEM_RES", "SYS_MEM") and
@@ -40,8 +56,8 @@ def verify(text: str, data: dict):
     allocatable = [e for e in entries if e["kind"] in
                    ("Conv", "BsData", "RtData", "BsCode", "RtCode") and
                    e["resource"] == "SYS_MEM" and e["hob"] in ("AddMem", "NoHob")]
-    if len(data.get("fixed_regions", [])) < 17:
-        raise ValueError("expected historical carve-out fixture incomplete")
+    if len(data.get("fixed_regions", [])) != required:
+        raise ValueError(f"unexpected {source_label} carve-out count")
 
     for region in data["fixed_regions"]:
         start = int(region["start"], 16)
@@ -58,7 +74,7 @@ def verify(text: str, data: dict):
                 if cursor >= end:
                     break
         if cursor < end:
-            raise ValueError(f"unprotected historical fixed area: {region['name']} "
+            raise ValueError(f"unprotected {source_label} fixed area: {region['name']} "
                              f"at 0x{cursor:x}")
 
     framebuffers = [e for e in entries if e["name"] == "Display Reserved"]
@@ -70,19 +86,20 @@ def verify(text: str, data: dict):
     if len(fd) != 1 or not (fd[0]["start"] <= 0x5FC41000 and
                            fd[0]["end"] >= 0x5FF00000):
         raise ValueError("inherited UEFI FD region inconsistent with Aurora FDF")
-    # This validates only historical static carve-outs, NOT the current
-    # bootloader's live allocatable memory or boot relocation safety.
+    # This validates the named static carve-outs only, NOT the running
+    # bootloader's base DTB/SMEM allocation or boot relocation safety.
     return len(data["fixed_regions"])
 
 def main():
     try:
-        n = verify(MAP.read_text(encoding="utf-8"),
-                   json.loads(FIXTURE.read_text(encoding="utf-8")))
+        memory_map = MAP.read_text(encoding="utf-8")
+        historical = verify(memory_map, json.loads(FIXTURE.read_text(encoding="utf-8")))
+        recent = verify(memory_map, json.loads(RECENT_DTBO_FIXTURE.read_text(encoding="utf-8")))
     except (ValueError, OSError, KeyError) as exc:
         print("FAIL: " + str(exc), file=sys.stderr)
         return 1
-    print(f"PASS: {n} historical fixed regions protected; "
-          "live Aurora LTE memory map STILL UNVERIFIED")
+    print(f"PASS: {historical} historical DTS and {recent} supplied DTBO "
+          "fixed regions protected; complete live Watch 2 memory map STILL UNVERIFIED")
     return 0
 
 if __name__ == "__main__":

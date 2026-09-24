@@ -20,8 +20,11 @@ static ARM_MEMORY_REGION_DESCRIPTOR_EX gDeviceMemoryDescriptorEx[] = {
     {"XBL AOP and SEC",   0x45E00000, 0x00200000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv, WRITE_BACK_XN},
     {"SMEM",              0x46000000, 0x00200000, AddMem, MEM_RES, WRITE_COMBINEABLE, Reserv, UNCACHED_UNBUFFERED_XN},
     {"WLAN MSA",          0x46200000, 0x00100000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv, WRITE_BACK_XN},
-    /* Modem, video, ADSP, IPA, GPU + still-unclassified high gap.
-     * Preserve the broader inherited reservation until current evidence. */
+    /* The supplied newer Watch 2 DTBO shifts modem/video/ADSP/IPA/GPU
+     * inside 0x4AB00000..0x54917000; the historical 2023 DTS places
+     * them earlier. Preserve the entire wider inherited PIL reservation
+     * 0x4AB00000..0x55700000 across both layouts. This DOES NOT verify
+     * the bootloader's full base DTB, live SMEM carve-outs or UEFI FD. */
     {"PIL Reserved",      0x4AB00000, 0x0AC00000, AddMem, MEM_RES, WRITE_COMBINEABLE, Reserv, UNCACHED_UNBUFFERED_XN},
     {"DXE Heap",          0x55700000, 0x05A00000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN},
     {"DBI Dump",          0x5B100000, 0x00A00000, NoHob,  MMAP_IO, INITIALIZED, Conv,   UNCACHED_UNBUFFERED_XN},
