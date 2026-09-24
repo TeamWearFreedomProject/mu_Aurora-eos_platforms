@@ -5,6 +5,9 @@ This is an experimental, **build-only** starting point copied from the Pixel Wat
 - Display geometry: 384x384 (Aurora panel configuration).
 - Platform product / SMBIOS identity: aurora / Aurora.
 - Build outputs: `Build/AuroraPkg`.
+- The `AuroraPkg.dec` package declaration is required by the upstream EDK2
+  DebugMacroCheck pre-build plugin; omitting it causes `Path(None)` during
+  package discovery.
 - **Temporary**: uses Selene's FDF and ACPI components, pending Aurora-specific device verification.
 - **Unverified**: RAM carve-outs, framebuffer address, GPIO/button wiring, UEFI relocation, bootshim and firmware dependencies.
 - Successful compilation **does not imply** the image is safe to boot on real hardware.

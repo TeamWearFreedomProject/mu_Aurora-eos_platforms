@@ -1,0 +1,11 @@
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = AuroraPkg
+  PACKAGE_GUID                   = 3ef98ccb-e141-4704-b8ea-88922dfbc852
+  PACKAGE_VERSION                = 0.1
+
+[Includes.common]
+  Include
+
+[Guids.common]
+  gAuroraPkgTokenSpaceGuid = { 0x0fc84ab9, 0xc18a, 0x48b6, { 0x98, 0x70, 0x82, 0xde, 0x56, 0xf4, 0x8b, 0x10 } }

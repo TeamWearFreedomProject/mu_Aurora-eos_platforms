@@ -29,7 +29,18 @@ jobs:
           python3 Platforms/AuroraPkg/PlatformBuild.py --update -t RELEASE
       - name: Compile Aurora firmware volumes
         run: bash ./build_fd_aurora.sh
+      - name: Publish build logs even when compilation fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-uefi-build-logs
+          if-no-files-found: warn
+          path: |
+            Build/BUILDLOG_AuroraPkg.txt
+            Build/AuroraPkg/RELEASE_CLANGPDB/OVERRIDELOG.TXT
+            Build/AuroraPkg/RELEASE_CLANGPDB/BUILD_TOOLS_REPORT/**
       - name: Publish compiled firmware volumes (NOT FLASH-READY)
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: aurora-uefi-unverified-fd
