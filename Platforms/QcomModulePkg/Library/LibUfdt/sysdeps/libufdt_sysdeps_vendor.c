@@ -1,4 +1,5 @@
 #include "libufdt_sysdeps.h"
+#include <Library/MemoryAllocationLib.h>
 #define EFI_DTBO_ERROR -1
 #define PRE_ALLOC_BUFFER_SZ (5 * 1024 * 1024)
 
@@ -233,8 +234,66 @@ char *dto_strdup(const char *s) {
 
 char *dto_strchr(const char *s, int c) { return strchr(s, c); }
 
+/*
+ * EDK2 firmware does not provide the host C runtime's strtoul().
+ * Parse an ASCII unsigned integer here instead; the DTBO fixup
+ * offsets currently use base 10, but the helper supports bases 2-36.
+ */
+static int dto_digit_value(char c) {
+  if (c >= '0' && c <= '9') return c - '0';
+  if (c >= 'a' && c <= 'z') return c - 'a' + 10;
+  if (c >= 'A' && c <= 'Z') return c - 'A' + 10;
+  return -1;
+}
+
 unsigned long int dto_strtoul(const char *nptr, char **endptr, int base) {
-  return strtoul(nptr, endptr, base);
+  const char *s = nptr;
+  unsigned long int result = 0;
+  const unsigned long int max = ~0UL;
+  int negative = 0, parsed = 0, overflow = 0, digit;
+
+  if (endptr) *endptr = (char *)nptr;
+  if (!s || (base != 0 && (base < 2 || base > 36))) return 0;
+
+  while (*s == ' ' || *s == '\t' || *s == '\n' ||
+         *s == '\r' || *s == '\v' || *s == '\f') s++;
+  if (*s == '+' || *s == '-') {
+    negative = (*s == '-');
+    s++;
+  }
+
+  if (base == 0) {
+    if (s[0] == '0') {
+      if ((s[1] == 'x' || s[1] == 'X') &&
+          dto_digit_value(s[2]) >= 0 && dto_digit_value(s[2]) < 16) {
+        base = 16;
+        s += 2;
+      } else {
+        base = 8;
+      }
+    } else {
+      base = 10;
+    }
+  } else if (base == 16 && s[0] == '0' &&
+             (s[1] == 'x' || s[1] == 'X') &&
+             dto_digit_value(s[2]) >= 0 && dto_digit_value(s[2]) < 16) {
+    s += 2;
+  }
+
+  while ((digit = dto_digit_value(*s)) >= 0 && digit < base) {
+    parsed = 1;
+    if (result > (max - (unsigned long int)digit) / (unsigned long int)base) {
+      overflow = 1;
+    } else if (!overflow) {
+      result = result * (unsigned long int)base + (unsigned long int)digit;
+    }
+    s++;
+  }
+
+  if (!parsed) return 0;
+  if (endptr) *endptr = (char *)s;
+  if (overflow) return max;
+  return negative ? (0UL - result) : result;
 }
 
 size_t dto_strlen(const char *s) { return strlen(s); }

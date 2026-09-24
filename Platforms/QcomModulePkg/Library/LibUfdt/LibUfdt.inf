@@ -22,6 +22,9 @@
   ufdt_overlay.c
   sysdeps/libufdt_sysdeps_vendor.c
 
+[LibraryClasses]
+  MemoryAllocationLib
+
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
