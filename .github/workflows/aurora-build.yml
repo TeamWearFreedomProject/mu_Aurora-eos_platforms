@@ -6,6 +6,7 @@ on:
     paths:
       - 'Platforms/AuroraPkg/**'
       - 'Platforms/QcomModulePkg/**'
+      - 'Platforms/SelunaPkg/**'
       - 'build_fd_aurora.sh'
       - '.github/workflows/aurora-build.yml'
 
