@@ -120,7 +120,14 @@ found at
 
 STATIC struct GetVarPartitionInfo part_info[] = {
     {"system", "partition-size:", "partition-type:", "", "ext4"},
-    {"userdata", "partition-size:", "partition-type:", "", USERDATA_FS_TYPE},
+    /*
+     * Temporary compile-only workaround for the CLANGPDB GitHub runner:
+     * the inherited USERDATA_FS_TYPE flag expands to /ext4/ rather than
+     * a valid C string literal. Keep the upstream ext4 placeholder until
+     * the Aurora userdata filesystem and toolchain quoting are verified.
+     * Do not treat this as a validated Pixel Watch 2 partition layout.
+     */
+    {"userdata", "partition-size:", "partition-type:", "", "ext4"},
     {"cache", "partition-size:", "partition-type:", "", "ext4"},
     {"metadata", "partition-size:", "partition-type:", "", "ext4"},
 };
