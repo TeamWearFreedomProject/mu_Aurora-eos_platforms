@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "device": "aurora",
+  "variant": "Pixel Watch 2 Wi-Fi",
+  "current_fingerprint": "google/aurora/aurora:17/CP3A.260905.002.E1/16053217:user/release-keys",
+  "bootloader_observed": "eos-6.08-15857178",
+  "observed_slot": "b",
+  "unlocked_observed": true,
+  "dtbo_reference_sha256": "1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85",
+  "dtbo_reference_warning": "Earlier user upload; accompanied by CP1A boot.img. CP3A provenance unverified.",
+  "inherited_bootshim_base": "0x5fc41000",
+  "status": "RESEARCH_ONLY_DO_NOT_BOOT_DO_NOT_FLASH",
+  "verified": {
+    "cp3a_stock_firmware": false,
+    "cp3a_base_dtb": false,
+    "cp3a_dtbo": false,
+    "bootloader_temporary_boot": false,
+    "watch2_bootstrap_compatibility": false,
+    "bootshim_relocation_memory": false,
+    "uefi_memory_map": false,
+    "watch2_acpi_peripherals": false,
+    "recovery_and_partition_backup": false
+  }
+}

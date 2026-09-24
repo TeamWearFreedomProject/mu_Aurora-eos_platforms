@@ -91,6 +91,8 @@ def main():
     summary = {
         "format": "Android boot image v4",
         "device_target": "Pixel Watch 2 (aurora) EXPERIMENTAL",
+        "observed_target_build": "CP3A.260905.002.E1",
+        "CP3A_FIRMWARE_COMPATIBILITY_VERIFIED": False,
         "HARDWARE_TESTED": False,
         "SAFE_TO_FLASH": False,
         "AVB_VERIFIED": False,

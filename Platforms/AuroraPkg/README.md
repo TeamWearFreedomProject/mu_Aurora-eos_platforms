@@ -1,6 +1,6 @@
 # Pixel Watch 2 (Aurora) UEFI bring-up
 
-This is an experimental research-only platform derived from Pixel Watch 3 Selene. Compilation and image structure have been checked; live Aurora LTE bootability has not.
+This is an experimental research-only platform derived from Pixel Watch 3 Selene. Compilation and image structure have been checked; live Aurora Wi-Fi bootability has not.
 
 - Display geometry: 384x384 (Aurora panel configuration).
 - Platform product / SMBIOS identity: aurora / Aurora.
@@ -9,7 +9,7 @@ This is an experimental research-only platform derived from Pixel Watch 3 Selene
   DebugMacroCheck pre-build plugin; omitting it causes `Path(None)` during
   package discovery.
 - Dedicated Aurora FDF, memory-map library and ACPI package now exist. FDF addresses, Qualcomm drivers and precompiled ACPI AML still inherit unverified Selene/PW3 assumptions.
-- **Unverified**: current firmware/SMEM memory reservations, runtime framebuffer mapping, GPIO/button wiring, UEFI relocation, BootShim and remaining firmware dependencies.
+- **Unverified**: target CP3A firmware/SMEM memory reservations, runtime framebuffer mapping, GPIO/button wiring, UEFI relocation, BootShim and remaining firmware dependencies.
 - Successful compilation **does not imply** the image is safe to boot on real hardware.
 
 Never write the generated images to persistent partitions. Before any future temporary boot test,
@@ -68,7 +68,7 @@ reservations, conservatively retains the original PIL range for the modem,
 video, ADSP, IPA and GPU areas, and keeps unverified remaining regions
 as inherited from Selene. A static CI audit guards 17 historical ranges
 against accidental assignment to allocatable RAM. This does **not**
-validate the 2026 Aurora LTE memory layout: the source README itself
+validate the target CP3A Aurora Wi-Fi memory layout: the source README itself
 labels its device WiFi and is unsure of device codename mapping. Its
 dynamic DMA pools have no guaranteed fixed addresses.
 
@@ -112,3 +112,18 @@ effective base DTB. It does not establish where `bootstrap.bin`,
 BootShim, the UEFI FD at `0x5FC41000`, the UEFI stack, or other
 bootloader/SMEM allocations can safely reside. None of these
 new checks makes the experimental image boot-ready.
+
+## Confirmed device identity: CP3A.260905.002.E1 (September 2026)
+
+Read-only reports from the **actual** Watch 2 establish:
+```
+adb: ro.product.device = aurora
+adb: ro.build.fingerprint = google/aurora/aurora:17/CP3A.260905.002.E1/16053217:user/release-keys
+fastboot: product aurora / unlocked yes / slot b at observation
+fastboot: bootloader eos-6.08-15857178
+```
+Google's [September 2026 Watch bulletin](https://support.google.com/googlepixelwatch/thread/467479812/google-pixel-watch-update-september-2026) names the same build for Pixel Watch 2. The `eos-` version prefix on the bootloader does not override the `aurora` device ID.
+
+The older uploaded `dtbo.img` (SHA-256 `1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85`) was supplied with a **CP1A** boot image. It was not proven to match the running CP3A firmware. The historical 2023 DTS predates both. Neither proves that the inherited `bootstrap.bin`, 0x5FC41000 BootShim/FD relocation, UEFI stack or Watch 3 ACPI tables are compatible with CP3A.
+
+The machine-readable [CP3A target evidence checklist](Research/target_cp3a_verification.json) deliberately marks every hardware compatibility item unverified. An early CI check guards this negative claim. Successful compilation, header parsing and historical fixed-region checks **do not authorize fastboot boot or flashing**. Real CP3A Aurora bootloader + base DTB / DTBO, live SMEM, verified relocation and recovery procedure remain necessary.
