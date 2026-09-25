@@ -127,3 +127,41 @@ Google's [September 2026 Watch bulletin](https://support.google.com/googlepixelw
 The older uploaded `dtbo.img` (SHA-256 `1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85`) was supplied with a **CP1A** boot image. It was not proven to match the running CP3A firmware. The historical 2023 DTS predates both. Neither proves that the inherited `bootstrap.bin`, 0x5FC41000 BootShim/FD relocation, UEFI stack or Watch 3 ACPI tables are compatible with CP3A.
 
 The machine-readable [CP3A target evidence checklist](Research/target_cp3a_verification.json) deliberately marks every hardware compatibility item unverified. An early CI check guards this negative claim. Successful compilation, header parsing and historical fixed-region checks **do not authorize fastboot boot or flashing**. Real CP3A Aurora bootloader + base DTB / DTBO, live SMEM, verified relocation and recovery procedure remain necessary.
+
+## Next: read-only live CP3A reserved-memory evidence (not boot approval)
+
+Google's September 2026 update announcement confirms the CP3A.260905.002.E1
+Watch 2 build, but the factory/OTA catalog is terms-gated and no matching
+CP3A image or verified CP3A DTBO has been obtained for this project.
+Do NOT substitute the older CP1A DTBO, the 2023 DTS, or the PW3 bootstrap.
+
+The optional `tools/collect_cp3a_memory.ps1` script reads ONLY the running
+Linux kernel's `/sys/firmware/devicetree/base/reserved-memory` tree over
+normal ADB. Run while the watch is normally booted on the exact fingerprint,
+from PowerShell in `C:\platform-tools` after copying the script there:
+
+```powershell
+.\collect_cp3a_memory.ps1
+```
+
+If PowerShell script execution is restricted, do not bypass the restriction;
+the same limited evidence can be inspected interactively with:
+
+```powershell
+.\adb.exe shell getprop ro.build.fingerprint
+.\adb.exe shell ls /sys/firmware/devicetree/base/reserved-memory
+```
+
+Then run `python tools/audit_cp3a_runtime.py <snapshot-folder> --output report.json`
+on a PC with Python. The audit handles big-endian `reg` cells, dynamically
+allocated `size`-only pools, and reports overlaps with current inherited
+UEFI FD/stack/heaps. It **never** declares hardware boot safety, even
+when it observes zero conflicts. ADB might deny access on a production
+watch; never root or modify the device merely to collect this snapshot.
+Only share the generated `report.json` if comfortable; no serial number
+or raw complete device tree is necessary for the next code review.
+
+**Important:** Running Linux's reserved-memory subtree is neither the
+pre-boot physical allocation map nor a complete bootloader/TrustZone
+memory layout. CP3A genuine bootloader relocation and ACPI still need
+independent evidence before any experimental fastboot boot.
