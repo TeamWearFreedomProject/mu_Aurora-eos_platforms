@@ -491,3 +491,20 @@ generator-test bug before any expensive build work. The GICC
 layout. The validator had incorrectly read offset 60, which is the beginning
 of the following redistributor-address field. The generated GICC binary
 layout itself was unchanged; only the assertion offset was corrected.
+
+## ACPI separation checkpoint
+
+Aurora now owns its CP2A-derived MADT/APIC and GTDT, plus its local FADT
+scaffold. That is meaningful progress, but it is not a mostly-finished ACPI
+port. A full audit of the remaining inherited tables found:
+
+- inherited DSDT CPU UIDs are structurally compatible;
+- DBG2's UART/USB addresses line up with CP2A, namespace semantics unverified;
+- inherited PPTT cache topology conflicts with CP2A;
+- inherited IORT SMMU bases do not match either CP2A SMMU;
+- inherited MCFG advertises ECAM windows with no CP2A PCI/PCIe node evidence.
+
+The machine-readable result lives in
+`Research/cp2a_remaining_acpi_audit.json`. CI keeps these remaining
+IORT/PPTT/MCFG issues marked as blockers. **IORT is the next major porting
+target.**

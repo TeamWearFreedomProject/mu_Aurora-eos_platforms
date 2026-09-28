@@ -4,8 +4,9 @@ Aurora.dsc and Aurora.fdf now select this local ACPI INF and a local
 Selene-derived FADT and Qualcomm header. No active Pixel Watch 2
 ACPI device definitions are implemented yet.
 
-The compiled AML inputs remain the upstream SelunaACPI/5100/builtin
-and SelunaACPI/common/builtin tables written for SW5100 PW3. These
+APIC/MADT and GTDT are now generated locally from CP2A evidence. The remaining
+compiled AML/binary inputs still include upstream SelunaACPI/5100/builtin and
+SelunaACPI/common tables written for the inherited SW5100 platform. These
 must be compared with **the exact Aurora Wi-Fi device tree and current
 firmware**, including GPIO/button IRQs, display/IOMMU, WLAN, storage,
 power, and I2C bus topology. Existing FADT ResetReg/PSCI fields and
@@ -81,3 +82,29 @@ This is still only a partial ACPI port. CSRT, DBG2, DSDT, IORT, MCFG,
 PPTT and common SSDTs are inherited, and peripheral Windows hardware IDs
 are not yet derived for Aurora. Building these tables successfully does
 not authorize hardware boot testing.
+
+## Remaining inherited ACPI final audit
+
+The current split is now clear: **CPU/interrupt core ACPI is partially
+Aurora-local, peripheral ACPI is not.**
+
+- **DSDT:** low-risk structurally. It only declares CPU0..CPU3 with UIDs
+  0..3, which match CP2A and the local MADT. It is still inherited packaging.
+- **DBG2:** its UART base `0x04A98000` and USB base `0x04E00000` match
+  CP2A MMIO evidence, but the namespace paths `\_SB.UARD` and
+  `\_SB.URS0` are not yet verified.
+- **PPTT:** blocker. The inherited table makes all four CPU nodes reference
+  the same two private cache objects. CP2A has distinct per-core L1 I/D
+  cache nodes and one shared 512 KiB L2, so the cache topology is not an
+  Aurora description.
+- **IORT:** major blocker. Its two SMMU bases are `0x15000000` and
+  `0x02CA0000`; CP2A's actual SMMUs are `0x059A0000` (KGSL) and
+  `0x0C600000` (apps). There are **zero exact base matches**.
+- **MCFG:** blocker. It advertises ECAM at `0x60000000` and
+  `0x40000000`, addresses our current memory map treats as reserved/kernel
+  memory. The two CP2A base DTBs contain **no PCI/PCIe nodes**. Do not trust
+  this inherited table without independent Aurora PCIe evidence.
+
+Therefore the next large ACPI target is **IORT**, not cosmetic DSDT cleanup.
+Until Aurora's SMMU/device mappings are rebuilt, Windows DMA/IOMMU behavior
+cannot be treated as valid.

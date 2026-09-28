@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "target": "Pixel Watch 2 Wi-Fi / aurora / CP2A.260603.001.S1",
+  "source_vendor_kernel_boot_sha256": "ea6d8e296cdd66fbb356f1b1563f1ed393b089b3c08e0e5215bcc74a88e47d98",
+  "selected_tables": {
+    "local_cp2a_derived": [
+      "APIC/MADT",
+      "GTDT"
+    ],
+    "local_platform_scaffold": [
+      "FADT"
+    ],
+    "inherited": [
+      "CSRT",
+      "DBG2",
+      "DSDT",
+      "IORT",
+      "MCFG",
+      "PPTT",
+      "SSDT",
+      "TPMDev",
+      "SoftwareTpm2Table"
+    ]
+  },
+  "inherited_table_audit": {
+    "DSDT": {
+      "verdict": "STRUCTURALLY_COMPATIBLE_CPU_ONLY_BUT_STILL_INHERITED",
+      "details": "Inherited DSDT contains only CPU0..CPU3, ACPI0007, UIDs 0..3. Those UIDs match CP2A's four CPUs and the Aurora-local MADT processor UIDs.",
+      "hardware_blocker": false
+    },
+    "DBG2": {
+      "verdict": "ADDRESS_MATCH_PARTIAL_NAMESPACE_UNVERIFIED",
+      "uart_base": "0x04a98000",
+      "usb_base": "0x04e00000",
+      "cp2a_uart_base_match": true,
+      "cp2a_usb_mmio_match": true,
+      "namespace_paths": [
+        "\\_SB.UARD",
+        "\\_SB.URS0"
+      ],
+      "namespace_verified": false,
+      "hardware_blocker": false
+    },
+    "PPTT": {
+      "verdict": "CACHE_TOPOLOGY_MISMATCH_BLOCKER",
+      "inherited_cpu_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "inherited_all_cpu_nodes_share_private_cache_offsets": [
+        "0x8e",
+        "0xa6"
+      ],
+      "cp2a_l1_cache_model": "Each CPU has distinct l1-icache and l1-dcache nodes; all four CPUs share one 512 KiB L2 via next-level-cache phandle 5.",
+      "cp2a_distinct_l1_phandles": [
+        393,
+        394,
+        395,
+        396,
+        397,
+        398,
+        399,
+        400
+      ],
+      "hardware_blocker": true
+    },
+    "IORT": {
+      "verdict": "SMMU_BASE_MISMATCH_MAJOR_BLOCKER",
+      "inherited_smmu_bases": [
+        "0x15000000",
+        "0x02ca0000"
+      ],
+      "cp2a_smmu_bases": [
+        "0x059a0000",
+        "0x0c600000"
+      ],
+      "exact_base_match_count": 0,
+      "note": "Inherited IORT cannot be treated as an Aurora DMA/IOMMU description.",
+      "hardware_blocker": true
+    },
+    "MCFG": {
+      "verdict": "NO_CP2A_PCIE_EVIDENCE_AND_ECAM_OVERLAPS_MEMORY_BLOCKER",
+      "inherited_segments": [
+        {
+          "segment": 0,
+          "base": "0x60000000",
+          "bus_start": 0,
+          "bus_end": 1,
+          "current_uefi_region": "TZ stat / reserved"
+        },
+        {
+          "segment": 1,
+          "base": "0x40000000",
+          "bus_start": 0,
+          "bus_end": 1,
+          "current_uefi_region": "Kernel / reserved"
+        }
+      ],
+      "cp2a_base_dtb_pci_or_pcie_nodes": 0,
+      "note": "Do not trust inherited ECAM windows without independent Aurora PCIe evidence.",
+      "hardware_blocker": true
+    },
+    "CSRT": {
+      "verdict": "UNVERIFIED_INHERITED",
+      "hardware_blocker": true
+    },
+    "SSDT": {
+      "verdict": "UNVERIFIED_INHERITED_COMMON_TABLE",
+      "hardware_blocker": true
+    },
+    "TPMDev": {
+      "verdict": "INHERITED_SOFTWARE_TPM_RESOURCE_UNAUDITED",
+      "hardware_blocker": false
+    },
+    "SoftwareTpm2Table": {
+      "verdict": "INHERITED_SOFTWARE_TPM_TABLE_UNAUDITED",
+      "hardware_blocker": false
+    }
+  },
+  "separation_status": {
+    "cpu_interrupt_core_localized": true,
+    "platform_peripheral_acpi_localized": false,
+    "inherited_table_count": 9,
+    "major_remaining_blockers": [
+      "IORT",
+      "PPTT",
+      "MCFG",
+      "CSRT",
+      "SSDT"
+    ],
+    "next_priority": "IORT",
+    "reason": "IORT is the DMA/IOMMU description and its inherited SMMU bases do not match either CP2A SMMU."
+  },
+  "hardware_boot_approved": false
+}
