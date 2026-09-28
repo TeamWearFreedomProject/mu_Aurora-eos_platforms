@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "comparison": "Pixel Watch 2 CP1A -> CP2A DTBO",
+  "cp1a": {
+    "sha256": "1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85",
+    "fingerprint": "google/aurora/aurora:16/CP1A.260305.014.W2/14419598:user/release-keys"
+  },
+  "cp2a": {
+    "sha256": "5f91d117e34dc554a90891bedf52dfa5dc7ebc3f1c1f94e8edd769e6c70d3b31",
+    "fingerprint": "google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys"
+  },
+  "coverage": {
+    "overlay_count": 11,
+    "identical_diff_pattern_across_all_overlays": true,
+    "changed_properties_per_overlay": 15,
+    "added_nodes_per_overlay": 5,
+    "removed_nodes_per_overlay": 0
+  },
+  "first_boot_relevance": {
+    "reserved_memory_fixed_overrides": "UNCHANGED_CP1A_TO_CP2A",
+    "splash_framebuffer_reserved_range": "UNCHANGED_0x5c000000_0x5cf00000",
+    "display_geometry": "UNCHANGED_384x384_IN_OVERLAYS",
+    "mcu_gpio_crash_wake": "CHANGED_CP2A_ADDS_GPIO19_AND_google_gpiochipwake0",
+    "battery_overrides": "CHANGED_CP2A_REMOVES_TERM_VOLTAGE_AND_DEBOUNCE",
+    "gbms_virtual_storage_status_override": "CHANGED_CP2A_REMOVES_EXPLICIT_DISABLED_OVERRIDE",
+    "bootshim_relocation": "NOT_PRESENT_IN_DTBO_UNVERIFIED",
+    "bootstrap_compatibility": "NOT_PRESENT_IN_DTBO_UNVERIFIED",
+    "base_dtb_and_live_smem": "NOT_PRESENT_IN_DTBO_UNVERIFIED"
+  },
+  "cp2a_added_nodes": [
+    "/fragment@63/__overlay__/gpiochipwake0",
+    "/fragment@64/__overlay__/mcu-pins",
+    "/fragment@64/__overlay__/mcu-pins/crash",
+    "/fragment@64/__overlay__/mcu-pins/crash/config",
+    "/fragment@64/__overlay__/mcu-pins/crash/mux"
+  ],
+  "cp2a_gpio_facts": {
+    "compatible": "google,gpiochipwake0",
+    "crash_gpio_specifier": [
+      "TLMM phandle via fixup",
+      "GPIO 19",
+      "flags 0"
+    ],
+    "pinmux_function": "gpio",
+    "pin": "gpio19",
+    "drive_strength": 2,
+    "bias": "pull-down",
+    "input_enable": true
+  },
+  "notes": [
+    "All 11 Eos/Aurora overlay variants show the same CP1A-to-CP2A structural/property diff pattern.",
+    "The reserved-memory overlay reg values are unchanged; this strengthens the static framebuffer/PIL evidence only.",
+    "The DTBO cannot validate pre-Linux bootloader ownership, the 0x5fc41000 BootShim/FD relocation, or bootstrap.bin compatibility.",
+    "CP2A GPIO changes matter for later MCU wake/crash/button/power work; they are not evidence that the current UEFI image is safe to boot."
+  ]
+}

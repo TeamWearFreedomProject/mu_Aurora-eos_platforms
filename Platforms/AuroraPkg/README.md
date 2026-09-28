@@ -213,3 +213,24 @@ complete base DTB, full early firmware/SMEM allocation map, AVB-verified
 matching boot.img, or evidence that inherited Watch 3
 `bootstrap.bin` / `0x5FC41000` BootShim relocation is safe.
 The experimental UEFI image remains **DO NOT FLASH / DO NOT FASTBOOT BOOT**.
+
+## CP1A -> CP2A: what actually changed for bring-up priority
+
+A complete property-level comparison of all 11 Watch 2 DTBO overlays found
+the **same diff pattern on every overlay**: 15 changed properties, five added
+nodes, and no removed nodes. The six fixed reserved-memory overrides and the
+384x384 panel/splash reservation are unchanged.
+
+That narrows the first-boot problem:
+
+1. **Still critical / unresolved:** inherited `bootstrap.bin`, BootShim copy
+   destination `0x5FC41000`, UEFI FD/stack/heap ownership, base DTB/SMEM.
+2. **Static evidence improved:** CP2A preserves the CP1A modem/video/ADSP/IPA/GPU
+   overlay ranges and `0x5C000000..0x5CF00000` splash reservation.
+3. **Later hardware work:** CP2A adds `google,gpiochipwake0` + GPIO19 MCU
+   crash/wake pin configuration and changes BMS/GBMS overrides. These matter
+   for wake/power/buttons and a future ACPI port, not for proving BootShim safe.
+
+The derived comparison is stored in
+`Research/cp1a_cp2a_dtbo_evolution.json` and guarded by CI. This does not
+turn the generated image into a hardware-tested image.

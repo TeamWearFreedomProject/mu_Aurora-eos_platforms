@@ -33,6 +33,19 @@ class MemoryMapTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             audit.verify(self.original, altered)
 
+
+    def test_cp1a_cp2a_evolution_fixture(self):
+        evolution = json.loads((audit.ROOT / "Platforms/AuroraPkg/Research/cp1a_cp2a_dtbo_evolution.json").read_text())
+        self.assertEqual(evolution["coverage"]["overlay_count"], 11)
+        self.assertTrue(evolution["coverage"]["identical_diff_pattern_across_all_overlays"])
+        self.assertEqual(evolution["coverage"]["changed_properties_per_overlay"], 15)
+        self.assertEqual(evolution["coverage"]["added_nodes_per_overlay"], 5)
+        self.assertEqual(evolution["coverage"]["removed_nodes_per_overlay"], 0)
+        self.assertEqual(evolution["cp2a_gpio_facts"]["pin"], "gpio19")
+        self.assertEqual(evolution["first_boot_relevance"]["reserved_memory_fixed_overrides"],
+                         "UNCHANGED_CP1A_TO_CP2A")
+        self.assertTrue(evolution["first_boot_relevance"]["bootshim_relocation"].endswith("UNVERIFIED"))
+
     def test_detects_new_dtbo_modem_expansion(self):
         # The old DTS ended its modem reservation at 0x50900000.
         # The supplied DTBO extends it to 0x52900000, with video + ADSP
