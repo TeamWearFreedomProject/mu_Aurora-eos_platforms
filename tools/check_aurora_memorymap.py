@@ -10,6 +10,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 MAP = ROOT / "Platforms/AuroraPkg/Library/PlatformMemoryMapLib/PlatformMemoryMapLib.c"
 FIXTURE = ROOT / "Platforms/AuroraPkg/Research/early_pw2_reserved_regions.json"
 RECENT_DTBO_FIXTURE = ROOT / "Platforms/AuroraPkg/Research/supplied_pw2_dtbo_reserved_regions.json"
+CP2A_DTBO_FIXTURE = ROOT / "Platforms/AuroraPkg/Research/supplied_cp2a_dtbo_reserved_regions.json"
+EXPECTED_CP2A_SHA256 = "5f91d117e34dc554a90891bedf52dfa5dc7ebc3f1c1f94e8edd769e6c70d3b31"
+EXPECTED_CP2A_FINGERPRINT = "google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys"
 # The newer fixture records *only* the six fixed overrides in dtbo.img.
 # Base DTB, SMEM partitions, dynamic DMA pools and live mappings are unknown.
 ENTRY = re.compile(
@@ -39,7 +42,12 @@ def verify(text: str, data: dict):
         required = 17
         source_label = "historical DTS"
     elif "dtbo_sha256" in data:
-        if data["dtbo_sha256"] != "1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85":
+        if data["dtbo_sha256"] == EXPECTED_CP2A_SHA256:
+            if data.get("build_fingerprint") != EXPECTED_CP2A_FINGERPRINT:
+                raise ValueError("CP2A DTBO fingerprint mismatch; refuse unverified source")
+            if data.get("previous_cp1a_dtbo_sha256") != "1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85":
+                raise ValueError("CP2A-to-CP1A comparison provenance changed")
+        elif data["dtbo_sha256"] != "1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85":
             raise ValueError("supplied DTBO provenance changed without review")
         if (data.get("dtbo_entry_count") != 11 or
                 data.get("observed_overlays_with_identical_fixed_overrides") != 11):
@@ -95,11 +103,12 @@ def main():
         memory_map = MAP.read_text(encoding="utf-8")
         historical = verify(memory_map, json.loads(FIXTURE.read_text(encoding="utf-8")))
         recent = verify(memory_map, json.loads(RECENT_DTBO_FIXTURE.read_text(encoding="utf-8")))
+        cp2a = verify(memory_map, json.loads(CP2A_DTBO_FIXTURE.read_text(encoding="utf-8")))
     except (ValueError, OSError, KeyError) as exc:
         print("FAIL: " + str(exc), file=sys.stderr)
         return 1
-    print(f"PASS: {historical} historical DTS and {recent} supplied DTBO "
-          "fixed regions protected; complete live Watch 2 memory map STILL UNVERIFIED")
+    print(f"PASS: {historical} 2023 DTS, {recent} CP1A DTBO and {cp2a} CP2A "
+          "fixed regions protected; CP2A complete bootloader memory map STILL UNVERIFIED")
     return 0
 
 if __name__ == "__main__":

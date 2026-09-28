@@ -176,3 +176,40 @@ checks each node's `status` and ignores explicit `disabled` nodes.
 Actual binary `reg` values override the often stale node-name addresses.
 A full read-only subtree capture is required to determine overlaps, and
 its resulting lack of overlaps still does not establish bootloader safety.
+
+## Verified uploaded CP2A DTBO: 2026 June Aurora Wi-Fi build
+
+A newly user-uploaded **8 MiB** Pixel Watch 2 `dtbo.img` (SHA-256
+`5f91d117e34dc554a90891bedf52dfa5dc7ebc3f1c1f94e8edd769e6c70d3b31`) contains the *internal*
+`com.android.build.dtbo.fingerprint` value:
+
+```
+google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys
+```
+
+This distinguishes it from the original CP1A DTBO
+(`1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85`), which contains the CP1A fingerprint. This is
+strong **image-internal CP2A provenance**; the original official ZIP and
+its checksum have not been independently verified.
+
+All 11 overlays (Eos and Aurora board-ID families) have exactly the
+**same six fixed reserved-memory `reg` ranges as the supplied CP1A
+DTBO**: modem `0x4AB00000..0x52900000`, video
+`0x52900000..0x53000000`, ADSP `0x53000000..0x54900000`,
+IPA and GPU `0x54900000..0x54917000`. No changes to the
+current broad `PIL Reserved` UEFI reservation are required for
+these six overlays. The 11 overlays do differ from CP1A in *other*
+properties: 15 changed properties, five newly added DT nodes per
+overlay, new `google,gpiochipwake0` and GPIO19 MCU crash wiring,
+and changed battery charge overrides. Preserve these differences
+when later investigating buttons, wake and ACPI GPIO.
+
+CI now separately guards CP1A and CP2A fixed overrides. The original
+CP3A device-fingerprint and ADB tools above document the **previous**
+firmware; the owner reports having downgraded to CP2A but cannot
+complete setup without an Android phone, so a new *live ADB fingerprint*
+has not been observed. The CP2A DTBO alone still does NOT contain a
+complete base DTB, full early firmware/SMEM allocation map, AVB-verified
+matching boot.img, or evidence that inherited Watch 3
+`bootstrap.bin` / `0x5FC41000` BootShim relocation is safe.
+The experimental UEFI image remains **DO NOT FLASH / DO NOT FASTBOOT BOOT**.

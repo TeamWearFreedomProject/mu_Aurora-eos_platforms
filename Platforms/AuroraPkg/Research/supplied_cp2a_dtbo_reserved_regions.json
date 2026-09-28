@@ -1,0 +1,53 @@
+{
+  "source_description": "User-uploaded 8 MiB Pixel Watch 2 DTBO, internal com.android.build.dtbo.fingerprint parsed from binary; only derived facts committed; original IMG remains private.",
+  "dtbo_sha256": "5f91d117e34dc554a90891bedf52dfa5dc7ebc3f1c1f94e8edd769e6c70d3b31",
+  "build_fingerprint": "google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys",
+  "previous_cp1a_dtbo_sha256": "1854fda34ad79d7ccc96df1632144ae8d6e0151381303012c41ae80109060c85",
+  "dtbo_entry_count": 11,
+  "observed_overlays_with_identical_fixed_overrides": 11,
+  "variants": [
+    "Eos board-ID family 0x204xx",
+    "Aurora board-ID family 0x205xx"
+  ],
+  "scope": "Six fixed reg properties in /fragment@reserved-memory/__overlay__ of all 11 overlays; overlay alone does NOT establish effective base DTB or bootloader memory ownership.",
+  "finding": "All six fixed overrides are byte-for-byte identical to the user-supplied CP1A DTBO in every corresponding overlay.",
+  "other_cp1a_to_cp2a_changes": [
+    "All 11 overlays: 15 property changes, 5 added DT nodes, 0 removed DT nodes (comparing parsed FDT nodes and properties).",
+    "MCU wake/crash GPIO: added google,gpiochipwake0; GPIO19 mux/config, changed phandle assignment.",
+    "Battery google,bms: deleted google,chg-term-voltage and google,chg-term-voltage-debounce overrides.",
+    "Removed explicit disabled status from google,gbms_virt_storage overlay; resultant effective status requires base DTB."
+  ],
+  "node_name_warning": "Some IPA/GPU node names retain @547xxxxx, but effective overlay reg values are 0x549xxxxx. Trust reg, not node suffix.",
+  "fixed_regions": [
+    {
+      "name": "modem region",
+      "start": "0x4ab00000",
+      "length": "0x7e00000"
+    },
+    {
+      "name": "video region",
+      "start": "0x52900000",
+      "length": "0x700000"
+    },
+    {
+      "name": "ADSP region",
+      "start": "0x53000000",
+      "length": "0x1900000"
+    },
+    {
+      "name": "IPA firmware",
+      "start": "0x54900000",
+      "length": "0x10000"
+    },
+    {
+      "name": "IPA GSI",
+      "start": "0x54910000",
+      "length": "0x5000"
+    },
+    {
+      "name": "GPU",
+      "start": "0x54915000",
+      "length": "0x2000"
+    }
+  ]
+}

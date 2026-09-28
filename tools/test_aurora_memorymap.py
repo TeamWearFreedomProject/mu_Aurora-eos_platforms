@@ -10,12 +10,28 @@ class MemoryMapTests(unittest.TestCase):
         cls.original = audit.MAP.read_text(encoding="utf-8")
         cls.regions = json.loads(audit.FIXTURE.read_text(encoding="utf-8"))
         cls.recent_dtbo = json.loads(audit.RECENT_DTBO_FIXTURE.read_text(encoding="utf-8"))
+        cls.cp2a_dtbo = json.loads(audit.CP2A_DTBO_FIXTURE.read_text(encoding="utf-8"))
 
     def test_historical_regions_protected(self):
         self.assertEqual(audit.verify(self.original, self.regions), 17)
 
     def test_supplied_dtbo_fixed_overrides_protected(self):
         self.assertEqual(audit.verify(self.original, self.recent_dtbo), 6)
+
+    def test_cp2a_fixed_overrides_protected(self):
+        self.assertEqual(audit.verify(self.original, self.cp2a_dtbo), 6)
+
+    def test_cp1a_cp2a_fixed_overrides_match(self):
+        def regions(data):
+            return sorted((r["name"], int(r["start"], 16),
+                           int(r["length"], 16)) for r in data["fixed_regions"])
+        self.assertEqual(regions(self.recent_dtbo), regions(self.cp2a_dtbo))
+
+    def test_rejects_cp2a_wrong_fingerprint(self):
+        altered = dict(self.cp2a_dtbo)
+        altered["build_fingerprint"] = altered["build_fingerprint"].replace("CP2A", "CP3A")
+        with self.assertRaises(ValueError):
+            audit.verify(self.original, altered)
 
     def test_detects_new_dtbo_modem_expansion(self):
         # The old DTS ended its modem reservation at 0x50900000.
