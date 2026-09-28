@@ -467,3 +467,17 @@ as **unverified** rather than deleted on absence-of-DT evidence.
 This removes two of the largest known Seluna ACPI mismatches, but the
 remaining ACPI tables and `0x5FC41000` pre-Linux ownership remain
 research blockers. Output remains DO-NOT-BOOT / DO-NOT-FLASH.
+
+## ACPI generator CI fix
+
+The first Aurora-local GTDT build failed before EDK2 compilation because the
+Python `struct.pack()` format for the fixed GTDT body encoded only eight
+32-bit fields between its two 64-bit addresses, while ACPI GTDT revision 2
+requires nine: Reserved plus four interrupt/flag pairs. The generator passed
+13 values to a 12-field format and raised
+`struct.error: pack expected 12 items for packing (got 13)`.
+
+The format is corrected to `<QIIIIIIIIIQII`, matching the 60-byte fixed
+GTDT body used by the inherited 0x9C-byte table layout. CI now executes both
+the generator's `--check-only` path and `check_aurora_acpi.py` before
+installing build dependencies, so generator/layout regressions fail early.

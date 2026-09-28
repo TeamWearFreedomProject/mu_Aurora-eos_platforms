@@ -101,7 +101,7 @@ def build_apic() -> bytes:
 def build_gtdt() -> bytes:
     secure, nonsecure, virt, hyp = TIMER_GSIV
     body = bytearray(struct.pack(
-        "<QIIIIIIIIQII",
+        "<QIIIIIIIIIQII",
         0xFFFFFFFFFFFFFFFF, 0,
         secure, GTDT_LEVEL_LOW_FLAGS,
         nonsecure, GTDT_LEVEL_LOW_FLAGS,

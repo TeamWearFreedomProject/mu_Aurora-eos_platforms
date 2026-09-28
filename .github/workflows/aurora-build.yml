@@ -53,6 +53,8 @@ jobs:
           python3 tools/check_cp2a_boot_chain.py
           python3 tools/check_cp2a_target.py
           python3 tools/check_cp2a_soc.py
+          python3 tools/generate_aurora_acpi.py --check-only
+          python3 tools/check_aurora_acpi.py
           python3 tools/test_mkbootimg_signature.py
           python3 -m unittest discover -s tools -p 'test_cp3a_runtime.py' -v
           python3 -m unittest discover -s tools -p 'test_aurora_memorymap.py' -v
