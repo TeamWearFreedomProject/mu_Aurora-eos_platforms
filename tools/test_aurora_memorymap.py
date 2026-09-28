@@ -13,6 +13,17 @@ class MemoryMapTests(unittest.TestCase):
         cls.cp2a_dtbo = json.loads(audit.CP2A_DTBO_FIXTURE.read_text(encoding="utf-8"))
         cls.cp2a_base = json.loads(audit.CP2A_BASE_DTB_FIXTURE.read_text(encoding="utf-8"))
 
+    def test_memory_map_initializer_commas(self):
+        self.assertTrue(audit.check_initializer_commas(self.original))
+
+    def test_detects_missing_initializer_comma(self):
+        changed = self.original.replace(
+            '0x62401000, 0x1C9FF000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN},',
+            '0x62401000, 0x1C9FF000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN}')
+        self.assertNotEqual(changed, self.original)
+        with self.assertRaises(ValueError):
+            audit.check_initializer_commas(changed)
+
     def test_historical_regions_protected(self):
         self.assertEqual(audit.verify(self.original, self.regions), 17)
 

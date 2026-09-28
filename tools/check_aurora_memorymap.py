@@ -23,7 +23,21 @@ ENTRY = re.compile(
     r'(?P<hob>\w+)\s*,\s*(?P<resource>\w+)\s*,\s*\w+\s*,\s*'
     r'(?P<kind>\w+)\s*,', re.M)
 
+def check_initializer_commas(text: str):
+    """Catch trivial C array-entry separator mistakes before the expensive build."""
+    bad = []
+    for lineno, line in enumerate(text.splitlines(), 1):
+        stripped = line.strip()
+        if stripped.startswith('{"') and not stripped.startswith('{"Terminator"'):
+            if not stripped.endswith('},'):
+                bad.append(lineno)
+    if bad:
+        raise ValueError("memory-map initializer missing trailing comma at line(s): " +
+                         ", ".join(map(str, bad)))
+    return True
+
 def parse(text: str):
+    check_initializer_commas(text)
     result = []
     for m in ENTRY.finditer(text):
         d = m.groupdict()

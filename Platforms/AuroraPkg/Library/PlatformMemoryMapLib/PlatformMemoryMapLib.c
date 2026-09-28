@@ -52,7 +52,7 @@ static ARM_MEMORY_REGION_DESCRIPTOR_EX gDeviceMemoryDescriptorEx[] = {
     {"PStore",            0x61F00000, 0x00400000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv, WRITE_THROUGH_XN},
     {"RAM Partition",     0x62300000, 0x00100000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN},
     {"KInfo Reserved",    0x62400000, 0x00001000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv, WRITE_THROUGH_XN},
-    {"RAM Partition",     0x62401000, 0x1C9FF000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN}
+    {"RAM Partition",     0x62401000, 0x1C9FF000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN},
     /* DDR Bank 0 End */
     /* Carveout Region (0x7EE00000 -> 0x7FFFFFFF, Size 0x01200000) */
     /* DDR Bank 1 Start */
