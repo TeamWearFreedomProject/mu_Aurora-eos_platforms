@@ -143,7 +143,7 @@ def validate(apic: bytes, gtdt: bytes) -> None:
         off = 44 + i * 0x50
         assert apic[off] == 0x0B and apic[off + 1] == 0x50
         assert struct.unpack_from("<I", apic, off + 20)[0] == PMU_GSIV
-        assert struct.unpack_from("<I", apic, off + 60)[0] == VGIC_GSIV
+        assert struct.unpack_from("<I", apic, off + 56)[0] == VGIC_GSIV
         assert struct.unpack_from("<Q", apic, off + 68)[0] == mpidr
 
     # GICD and GICR.

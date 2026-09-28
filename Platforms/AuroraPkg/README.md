@@ -481,3 +481,13 @@ The format is corrected to `<QIIIIIIIIIQII`, matching the 60-byte fixed
 GTDT body used by the inherited 0x9C-byte table layout. CI now executes both
 the generator's `--check-only` path and `check_aurora_acpi.py` before
 installing build dependencies, so generator/layout regressions fail early.
+
+### MADT validator offset fix
+
+After the GTDT pack-format fix, the new preflight correctly exposed a second
+generator-test bug before any expensive build work. The GICC
+`Virtual GIC Interrupt` field is at byte offset **56 (0x38)** within an
+80-byte ARM GICC MADT subtable, as confirmed by the inherited decoded APIC
+layout. The validator had incorrectly read offset 60, which is the beginning
+of the following redistributor-address field. The generated GICC binary
+layout itself was unchanged; only the assertion offset was corrected.
