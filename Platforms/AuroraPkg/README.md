@@ -400,3 +400,31 @@ that range available before UEFI runs.
 So the missing artifact is no longer a DTB. The remaining blocker is
 **authoritative pre-Linux memory ownership / runtime-patched memory evidence**.
 Generated images remain DO-NOT-BOOT / DO-NOT-FLASH.
+
+## CP2A SoC audit: GIC/UART/MMIO mostly line up; ACPI does not
+
+The CP2A base DTBs now let us audit the inherited low-level register map.
+
+Confirmed exact matches include the GICv3 distributor at `0x0F200000`,
+redistributor at `0x0F300000`, TLMM at `0x00500000`, DISP_CC at
+`0x05F00000`, and watchdog at `0x0F017000`. The existing broader UEFI
+windows also cover CP2A GCC, SPMI, QUP, USB, MDSS, SMMU and memory-timer
+registers. The debug UART selected by the DTB `serial0` alias is
+`qcom,geni-debug-uart@0x04A98000`, exactly matching
+`PcdUartSerialBase`. UART output is **not** enabled by this finding: the
+current Aurora build still selects the null SerialPortLib in its default
+configuration, and clocks/pinctrl are not proven initialized for UEFI use.
+
+One inherited configuration value was clearly wrong for Aurora: the common
+SW5100 configuration map said `NumActiveCores=8` and `NumCpus=8`, while
+both CP2A base DTBs expose exactly four CPUs with MPIDRs `0,1,2,3`.
+Aurora now has its own configuration-map library with both values set to 4;
+all other configuration keys remain inherited/unverified.
+
+The larger blocker is ACPI. The inherited Seluna APIC table describes four
+CPU MPIDRs as `0,0x100,0x200,0x300`, not CP2A's `0,1,2,3`. Its GTDT also
+uses timer GSIVs 29/30/27/26 while the CP2A Monaco DTB encodes the four
+architected timer PPIs as 1/2/3/0. GICD/GICR addresses themselves match.
+These differences are recorded as **ACPI blockers**, not automatically
+rewritten, because the DT PPI-to-ACPI GSIV interpretation must be reviewed
+before generating Aurora-specific MADT/GTDT tables.

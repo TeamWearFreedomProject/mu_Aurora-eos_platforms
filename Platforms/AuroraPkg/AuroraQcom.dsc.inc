@@ -37,7 +37,7 @@
 
 [LibraryClasses.common]
   PlatformMemoryMapLib|AuroraPkg/Library/PlatformMemoryMapLib/PlatformMemoryMapLib.inf
-  PlatformConfigurationMapLib|QcomPkg/Library/PlatformConfigurationMapLib/PlatformConfigurationMapLib.inf
+  PlatformConfigurationMapLib|AuroraPkg/Library/PlatformConfigurationMapLib/PlatformConfigurationMapLib.inf
   PlatformPeiLib|QcomPkg/PlatformPei/PlatformPeiLib.inf
   PlatformPrePiLib|QcomPkg/Library/PlatformPrePiLib/PlatformPrePiLib.inf
   AslUpdateLib|SelunaPkg/Library/DxeAslUpdateLib/DxeAslUpdateLib.inf

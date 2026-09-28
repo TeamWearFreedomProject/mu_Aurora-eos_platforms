@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "target": "Pixel Watch 2 Wi-Fi / aurora / CP2A.260603.001.S1",
+  "source_vendor_kernel_boot_sha256": "ea6d8e296cdd66fbb356f1b1563f1ed393b089b3c08e0e5215bcc74a88e47d98",
+  "base_dtbs": [
+    "qcom,monacop (MSM ID 0x205)",
+    "qcom,monaco (MSM ID 0x1e6)"
+  ],
+  "cpu": {
+    "dtb_cpu_count": 4,
+    "dtb_mpidr_values": [
+      "0x0",
+      "0x1",
+      "0x2",
+      "0x3"
+    ],
+    "aurora_pcd_core_count": 4,
+    "aurora_pcd_cluster_count": 1,
+    "inherited_configuration_map_previous_num_active_cores": 8,
+    "inherited_configuration_map_previous_num_cpus": 8,
+    "aurora_configuration_map_num_active_cores": 4,
+    "aurora_configuration_map_num_cpus": 4,
+    "configuration_map_correction_applied": true
+  },
+  "gic": {
+    "compatible": "arm,gic-v3",
+    "distributor": [
+      "0x0f200000",
+      "0x00010000"
+    ],
+    "redistributor": [
+      "0x0f300000",
+      "0x00100000"
+    ],
+    "redistributor_stride": "0x00020000",
+    "maintenance_interrupt_raw": [
+      1,
+      9,
+      4
+    ],
+    "aurora_pcd_distributor": "0x0f200000",
+    "aurora_pcd_redistributor": "0x0f300000",
+    "aurora_memory_map_exact_match": true,
+    "inherited_acpi_gicd_exact_match": true,
+    "inherited_acpi_gicr_exact_match": true
+  },
+  "timer": {
+    "dtb_clock_hz": 19200000,
+    "dtb_arch_timer_interrupts_raw": [
+      [
+        1,
+        1,
+        65288
+      ],
+      [
+        1,
+        2,
+        65288
+      ],
+      [
+        1,
+        3,
+        65288
+      ],
+      [
+        1,
+        0,
+        65288
+      ]
+    ],
+    "dtb_memtimer": [
+      "0x0f120000",
+      "0x00001000"
+    ],
+    "aurora_pcd_clock_hz": 19200000,
+    "aurora_current_secure_interrupt": 29,
+    "aurora_current_nonsecure_interrupt": 30,
+    "inherited_acpi_gtdt_interrupts": {
+      "secure_el1": 29,
+      "nonsecure_el1": 30,
+      "virtual": 27,
+      "nonsecure_el2": 26
+    },
+    "cp2a_dtb_interrupt_encoding_matches_inherited_gtdt": false,
+    "action": "Do not auto-change timer interrupt PCD/GTDT until the Monaco PPI-to-ACPI GSIV interpretation is reviewed."
+  },
+  "uart": {
+    "alias": "serial0",
+    "compatible": "qcom,geni-debug-uart",
+    "base": "0x04a98000",
+    "size": "0x00004000",
+    "irq_raw": [
+      0,
+      333,
+      4
+    ],
+    "status": "ok",
+    "aurora_pcd_base": "0x04a98000",
+    "pcd_base_exact_match": true,
+    "note": "Aurora currently selects BaseSerialPortLibNull when screen/memory serial are both disabled; matching the base address does not prove clocks/pinctrl are initialized for UEFI UART output."
+  },
+  "mmio": [
+    {
+      "name": "TLMM",
+      "dtb_start": "0x00500000",
+      "dtb_length": "0x00300000",
+      "uefi_start": "0x00500000",
+      "uefi_length": "0x00300000",
+      "relationship": "exact"
+    },
+    {
+      "name": "GCC",
+      "dtb_start": "0x01410000",
+      "dtb_length": "0x001e0000",
+      "uefi_start": "0x01400000",
+      "uefi_length": "0x00200000",
+      "relationship": "covered_by_broader_uefi_window"
+    },
+    {
+      "name": "SPMI",
+      "dtb_ranges": [
+        [
+          "0x01c40000",
+          "0x00001100"
+        ],
+        [
+          "0x01e00000",
+          "0x02000000"
+        ],
+        [
+          "0x03e00000",
+          "0x00100000"
+        ],
+        [
+          "0x03f00000",
+          "0x000a0000"
+        ],
+        [
+          "0x01c0a000",
+          "0x00026000"
+        ]
+      ],
+      "uefi_start": "0x01c00000",
+      "uefi_length": "0x02800000",
+      "relationship": "all_ranges_covered"
+    },
+    {
+      "name": "QUP/UART",
+      "dtb_ranges": [
+        [
+          "0x04ac0000",
+          "0x00002000"
+        ],
+        [
+          "0x04a98000",
+          "0x00004000"
+        ]
+      ],
+      "uefi_start": "0x04a00000",
+      "uefi_length": "0x00100000",
+      "relationship": "all_ranges_covered"
+    },
+    {
+      "name": "USB",
+      "dtb_start": "0x04e00000",
+      "dtb_length": "0x00100000",
+      "uefi_start": "0x04e00000",
+      "uefi_length": "0x0011b000",
+      "relationship": "covered_by_broader_uefi_window"
+    },
+    {
+      "name": "MDSS",
+      "dtb_primary_start": "0x05e00000",
+      "dtb_primary_length": "0x0008f030",
+      "uefi_start": "0x05e00000",
+      "uefi_length": "0x00200000",
+      "relationship": "covered_by_broader_uefi_window"
+    },
+    {
+      "name": "DISP_CC",
+      "dtb_start": "0x05f00000",
+      "dtb_length": "0x00020000",
+      "uefi_start": "0x05f00000",
+      "uefi_length": "0x00020000",
+      "relationship": "exact"
+    },
+    {
+      "name": "SMMU",
+      "dtb_ranges": [
+        [
+          "0x0c600000",
+          "0x00080000"
+        ],
+        [
+          "0x0c7f2000",
+          "0x00000020"
+        ]
+      ],
+      "uefi_start": "0x0c600000",
+      "uefi_length": "0x00200000",
+      "relationship": "all_ranges_covered"
+    },
+    {
+      "name": "WDT",
+      "dtb_start": "0x0f017000",
+      "dtb_length": "0x00001000",
+      "uefi_start": "0x0f017000",
+      "uefi_length": "0x00001000",
+      "relationship": "exact"
+    },
+    {
+      "name": "QTIMER",
+      "dtb_start": "0x0f120000",
+      "dtb_length": "0x00001000",
+      "uefi_start": "0x0f120000",
+      "uefi_length": "0x00009000",
+      "relationship": "covered_by_broader_uefi_window"
+    },
+    {
+      "name": "GICD",
+      "dtb_start": "0x0f200000",
+      "dtb_length": "0x00010000",
+      "uefi_start": "0x0f200000",
+      "uefi_length": "0x00010000",
+      "relationship": "exact"
+    },
+    {
+      "name": "GICR",
+      "dtb_start": "0x0f300000",
+      "dtb_length": "0x00100000",
+      "uefi_start": "0x0f300000",
+      "uefi_length": "0x00100000",
+      "relationship": "exact"
+    }
+  ],
+  "inherited_acpi_blockers": {
+    "source_repo": "WOA-Project/acpi_oem_google_pixel_watch_common",
+    "source_commit": "f903f35c7fcdcc54d5ca36538cd298b55e286ff4",
+    "apic_cpu_mpidr_values": [
+      "0x0",
+      "0x100",
+      "0x200",
+      "0x300"
+    ],
+    "cp2a_dtb_cpu_mpidr_values": [
+      "0x0",
+      "0x1",
+      "0x2",
+      "0x3"
+    ],
+    "apic_cpu_mpidr_match": false,
+    "apic_gic_msi_frame_base": "0x0f210000",
+    "cp2a_base_dtb_has_gic_msi_frame_node": false,
+    "gtdt_timer_interrupt_match": false,
+    "status": "BLOCKER_NEEDS_AURORA_ACPI_PORT"
+  },
+  "hardware_boot_approved": false
+}

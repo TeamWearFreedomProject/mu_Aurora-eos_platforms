@@ -1,0 +1,20 @@
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AuroraPlatformConfigurationMapLib
+  FILE_GUID                      = F2C46238-AE27-5251-A9BA-22C2964A36F8
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformConfigurationMapLib
+
+[Sources]
+  PlatformConfigurationMapLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  SelunaPkg/SelunaPkg.dec
+
+[LibraryClasses]
+  BaseLib
