@@ -9,7 +9,8 @@ This is an experimental research-only platform derived from Pixel Watch 3 Selene
   DebugMacroCheck pre-build plugin; omitting it causes `Path(None)` during
   package discovery.
 - Dedicated Aurora FDF, memory-map library and ACPI package now exist. FDF addresses, Qualcomm drivers and precompiled ACPI AML still inherit unverified Selene/PW3 assumptions.
-- **Unverified**: target CP3A firmware/SMEM memory reservations, runtime framebuffer mapping, GPIO/button wiring, UEFI relocation, BootShim and remaining firmware dependencies.
+- **Current research target:** CP2A.260603.001.S1 after the owner's downgrade. CP3A evidence below is historical. Live CP2A ADB is unavailable because watch setup cannot currently be completed.
+- **Unverified**: CP2A base DTB / pre-Linux memory ownership, runtime framebuffer mapping, GPIO/button wiring, UEFI relocation, BootShim and remaining firmware dependencies.
 - Successful compilation **does not imply** the image is safe to boot on real hardware.
 
 Never write the generated images to persistent partitions. Before any future temporary boot test,
@@ -315,3 +316,35 @@ if anyone flips `relocation_verified` or `hardware_boot_approved`
 without replacing this evidence. The next high-value artifact is a matching
 **CP2A `vendor_boot.img`** (if present in the firmware package), because
 boot header v4 normally separates vendor data and the DTB from `boot.img`.
+
+## CP2A init_boot + vendor_boot: useful surprise
+
+Two more uploaded CP2A images close several packaging questions:
+
+- `init_boot.img` is Android boot header v4, contains **no kernel**, a
+  2,618,142-byte LZ4-legacy ramdisk, and advertises **boot signature size 0**.
+  Its ramdisk build.prop and AVB metadata carry the same
+  `CP2A.260603.001.S1` Aurora fingerprint.
+- `vendor_boot.img` is vendor boot v4 with a single **platform** vendor
+  ramdisk (16,802,729 bytes), 4 KiB pages, and the bootconfig lines
+  `androidboot.console=ttyMSM0` and `androidboot.memcg=1`.
+  Critically, its header says **DTB size = 0**, and there is no FDT magic
+  anywhere in the supplied image.
+
+The uploaded CP2A `boot.img` also does **not** solve the base-DTB problem:
+its only FDT blob is 72 bytes with zero string-table bytes and a 16-byte
+structure block — effectively an empty root-only FDT, not an Aurora hardware
+tree. `init_boot.img` contains no FDT either.
+
+So the earlier idea that `vendor_boot.img` would provide the matching base
+DTB was wrong for this watch. Public AsteroidOS Aurora packaging at commit
+`750506ad678a2b142f044fd4667655b7f1c702ea` documents a separate
+`vendor_kernel_boot.img` and says its `vkb-base.dtb` was extracted from
+that partition. That public blob is **not CP2A provenance**, so it is only a
+map to where the missing evidence lives, not a substitute for the matching
+CP2A image.
+
+The next high-value artifact is therefore a matching **CP2A
+`vendor_kernel_boot.img`**. Until its DTB and pre-Linux ownership are
+checked, `0x5FC41000` remains unverified and hardware boot approval remains
+false.

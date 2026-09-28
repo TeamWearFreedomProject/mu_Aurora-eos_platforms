@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "target": "Pixel Watch 2 Wi-Fi / aurora / CP2A.260603.001.S1",
+  "fingerprint": "google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys",
+  "uploaded_init_boot": {
+    "sha256": "72503b1e0ef5cb54512d666edf1c23bb1acbf47e0b69766b7dcdb3d4c728b46d",
+    "image_size_bytes": 8388608,
+    "android_boot_header_version": 4,
+    "kernel_size_bytes": 0,
+    "ramdisk_size_bytes": 2618142,
+    "boot_signature_size_bytes": 0,
+    "os_version": "17.0.0",
+    "security_patch": "2026-06",
+    "avb_footer": {
+      "original_image_size_bytes": 2625536,
+      "vbmeta_offset": 2625536,
+      "vbmeta_size": 832
+    },
+    "ramdisk": {
+      "compression": "LZ4 legacy",
+      "decompressed_size_bytes": 3899904,
+      "cpio_entry_count": 38
+    },
+    "embedded_build_prop_fingerprint_matches": true,
+    "fdt_magic_occurrences": 0
+  },
+  "uploaded_vendor_boot": {
+    "sha256": "72c4909328f2f4c60e49f90191cc8774334d7d59fdefb5607792a86cfceb28f6",
+    "image_size_bytes": 67108864,
+    "vendor_boot_header_version": 4,
+    "page_size_bytes": 4096,
+    "header_size_bytes": 2128,
+    "kernel_load_address": "0x8000",
+    "ramdisk_load_address": "0x1000000",
+    "vendor_ramdisk_size_bytes": 16802729,
+    "dtb_size_bytes": 0,
+    "dtb_load_address_field": "0x1f00000",
+    "vendor_ramdisk_table": {
+      "size_bytes": 108,
+      "entry_count": 1,
+      "entry_size_bytes": 108,
+      "entry_type": 1,
+      "entry_type_name": "platform",
+      "entry_name": "",
+      "board_id_words_all_zero": true
+    },
+    "bootconfig_size_bytes": 48,
+    "bootconfig": [
+      "androidboot.console=ttyMSM0",
+      "androidboot.memcg=1"
+    ],
+    "avb_footer": {
+      "original_image_size_bytes": 16818176,
+      "vbmeta_offset": 16818176,
+      "vbmeta_size": 640
+    },
+    "fingerprint_present_in_vbmeta_and_ramdisk": true,
+    "fdt_magic_occurrences": 0
+  },
+  "uploaded_cp2a_boot_dtb_check": {
+    "fdt_magic_occurrences": 1,
+    "fdt_file_offset_bytes": 34414272,
+    "fdt_total_size_bytes": 72,
+    "fdt_strings_size_bytes": 0,
+    "fdt_structure_size_bytes": 16,
+    "interpretation": "Root-only empty FDT blob; not a usable Aurora base DTB."
+  },
+  "base_dtb_result": {
+    "init_boot_contains_base_dtb": false,
+    "vendor_boot_contains_base_dtb": false,
+    "boot_contains_usable_base_dtb": false,
+    "cp2a_base_dtb_obtained": false
+  },
+  "public_aurora_port_reference": {
+    "repository": "AsteroidOS/meta-smartwatch",
+    "commit": "750506ad678a2b142f044fd4667655b7f1c702ea",
+    "path": "meta-aurora/recipes-bsp/aurora-boot-images/files/README.md",
+    "finding": "Aurora port documentation says its vkb-base.dtb was extracted from a working vendor_kernel_boot.img and that boot artifacts include boot.img, vendor_kernel_boot.img and init_boot.img.",
+    "limitation": "This public artifact is not CP2A provenance and cannot replace a matching CP2A vendor_kernel_boot image."
+  },
+  "next_evidence": "Matching CP2A vendor_kernel_boot.img, to inspect its DTB section and compare the effective base tree with the CP2A DTBO.",
+  "hardware_boot_approved": false
+}

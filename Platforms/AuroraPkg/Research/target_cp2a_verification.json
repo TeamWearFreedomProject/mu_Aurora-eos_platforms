@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "device": "aurora",
+  "variant": "Pixel Watch 2 Wi-Fi",
+  "target_build": "CP2A.260603.001.S1",
+  "target_fingerprint": "google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys",
+  "target_evidence": "Fingerprint is present independently in the uploaded CP2A boot, dtbo, init_boot and vendor_boot artifacts. Owner reports the watch was downgraded to CP2A; live ADB is currently unavailable because setup cannot be completed without an Android phone.",
+  "previous_live_observation": {
+    "firmware": "CP3A.260905.002.E1",
+    "bootloader": "eos-6.08-15857178",
+    "slot": "b",
+    "unlocked": true,
+    "note": "Historical observation before the downgrade; do not treat as a fresh CP2A live measurement."
+  },
+  "status": "RESEARCH_ONLY_DO_NOT_BOOT_DO_NOT_FLASH",
+  "verified_from_uploaded_cp2a_images": {
+    "boot_component": true,
+    "dtbo_component": true,
+    "init_boot_component": true,
+    "vendor_boot_component": true
+  },
+  "unverified": {
+    "live_cp2a_fingerprint": true,
+    "cp2a_vendor_kernel_boot": true,
+    "cp2a_base_dtb": true,
+    "pre_linux_memory_ownership": true,
+    "watch2_bootstrap_compatibility": true,
+    "bootshim_relocation_memory": true,
+    "uefi_memory_map": true,
+    "watch2_acpi_peripherals": true,
+    "recovery_and_partition_backup": true
+  },
+  "hardware_boot_approved": false
+}

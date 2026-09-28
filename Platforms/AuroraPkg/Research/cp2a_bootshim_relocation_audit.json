@@ -39,8 +39,15 @@
     "hardware_boot_approved": false
   },
   "required_next_evidence": [
-    "CP2A effective base DTB, preferably extracted from matching vendor_boot.img if that image contains the DTB",
-    "pre-Linux bootloader/firmware memory ownership or equivalent runtime evidence for 0x5fc41000..0x5ff00000",
-    "recovery path review before any hardware boot experiment"
-  ]
+    "Matching CP2A vendor_kernel_boot.img: the supplied CP2A vendor_boot.img has dtb_size=0, and boot.img contains only a 72-byte empty FDT.",
+    "Pre-Linux bootloader/firmware memory ownership or equivalent evidence for 0x5fc41000..0x5ff00000.",
+    "Recovery path review before any hardware boot experiment."
+  ],
+  "supplied_cp2a_partition_findings": {
+    "vendor_boot_dtb_size_bytes": 0,
+    "boot_embedded_fdt_total_size_bytes": 72,
+    "init_boot_fdt_occurrences": 0,
+    "base_dtb_obtained": false,
+    "next_partition_to_inspect": "vendor_kernel_boot"
+  }
 }

@@ -27,6 +27,12 @@ def check(d):
     assert i["known_fixed_region_overlap_observed"] is False
     assert i["relocation_verified"] is False
     assert i["hardware_boot_approved"] is False
+    p=d["supplied_cp2a_partition_findings"]
+    assert p["vendor_boot_dtb_size_bytes"]==0
+    assert p["boot_embedded_fdt_total_size_bytes"]==72
+    assert p["init_boot_fdt_occurrences"]==0
+    assert p["base_dtb_obtained"] is False
+    assert p["next_partition_to_inspect"]=="vendor_kernel_boot"
     assert len(d["required_next_evidence"])>=2
     return True
 
