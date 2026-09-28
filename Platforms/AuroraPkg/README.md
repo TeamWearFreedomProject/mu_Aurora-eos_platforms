@@ -293,3 +293,25 @@ the stock AVB footer merely by changing this field, and it still contains the
 inherited Seluna `bootstrap.bin` plus BootShim and UEFI FD rather than the
 CP2A stock kernel. The inherited `0x5FC41000` relocation remains the next
 critical blocker and is deliberately still marked unverified.
+
+## CP2A BootShim relocation audit: still a blocker
+
+The uploaded CP2A stock kernel's ARM64 Image header reports
+`text_offset = 0`, `image_size = 0x23A0000`, flags `0xA`, and
+`ARMd` magic. Those values come from the stock kernel itself; they do
+**not** provide the inherited UEFI destination `0x5FC41000`.
+
+The current BootShim still copies the UEFI FD to
+`0x5FC41000..0x5FF00000`. That range does not overlap the fixed
+CP2A DTBO reservations we extracted, and it lies between the historical
+DFPS end at `0x5D000000` and the historical stats region at
+`0x60000000`. This is only negative overlap evidence. Neither the CP2A
+DTBO nor the old 2023 DTS proves that the bootloader, TrustZone, SMEM or
+other pre-Linux firmware leaves that gap available.
+
+The machine-readable audit is
+`Research/cp2a_bootshim_relocation_audit.json`; CI deliberately fails
+if anyone flips `relocation_verified` or `hardware_boot_approved`
+without replacing this evidence. The next high-value artifact is a matching
+**CP2A `vendor_boot.img`** (if present in the firmware package), because
+boot header v4 normally separates vendor data and the DTB from `boot.img`.

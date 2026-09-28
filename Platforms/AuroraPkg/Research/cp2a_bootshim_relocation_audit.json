@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "target": "Pixel Watch 2 Wi-Fi / aurora / CP2A.260603.001.S1",
+  "uploaded_cp2a_boot": {
+    "sha256": "01c93386c44e7e0637c09b24340797d4dbca4986717ba2912f278f991c8ff3c1",
+    "kernel_sha256": "0ab5d6680d061f3d36f34078668aa2f14f08a5da729e31c19553554f4cbd3b42",
+    "arm64_text_offset": "0x0",
+    "arm64_image_size": "0x23a0000",
+    "arm64_flags": "0xa",
+    "arm64_magic": "ARMd"
+  },
+  "current_bootshim": {
+    "relocation_destination": "0x5fc41000",
+    "fd_size": "0x2bf000",
+    "relocation_end": "0x5ff00000",
+    "source": "inherited from upstream Selene/Luna BootShim packaging"
+  },
+  "observed_fixed_reserved_evidence": {
+    "cp2a_dtbo_fixed_ranges_end_before_relocation": true,
+    "splash": [
+      "0x5c000000",
+      "0x5cf00000"
+    ],
+    "dfps": [
+      "0x5cf00000",
+      "0x5d000000"
+    ],
+    "next_historical_fixed_region": [
+      "0x60000000",
+      "0x60100000"
+    ],
+    "note": "No supplied CP2A DTBO fixed override covers 0x5fc41000..0x5ff00000. The 2023 base DTS also has no fixed reserved-memory node there. Absence of a node is not proof that boot firmware leaves the region free."
+  },
+  "interpretation": {
+    "stock_kernel_header_does_not_supply_bootshim_absolute_destination": true,
+    "current_relocation_is_inherited_not_cp2a_derived": true,
+    "known_fixed_region_overlap_observed": false,
+    "relocation_verified": false,
+    "hardware_boot_approved": false
+  },
+  "required_next_evidence": [
+    "CP2A effective base DTB, preferably extracted from matching vendor_boot.img if that image contains the DTB",
+    "pre-Linux bootloader/firmware memory ownership or equivalent runtime evidence for 0x5fc41000..0x5ff00000",
+    "recovery path review before any hardware boot experiment"
+  ]
+}
