@@ -231,6 +231,16 @@
       "uefi_start": "0x0f300000",
       "uefi_length": "0x00100000",
       "relationship": "exact"
+    },
+    {
+      "name": "VIDC/VENUS",
+      "dtb_start": "0x05a00000",
+      "dtb_length": "0x00200000",
+      "uefi_previous_length": "0x000f0000",
+      "uefi_start": "0x05a00000",
+      "uefi_length": "0x00200000",
+      "relationship": "corrected_to_exact_cp2a_window",
+      "note": "Previous inherited window covered only 0x05A00000..0x05AF0000; CP2A DTB requires 0x05A00000..0x05C00000."
     }
   ],
   "inherited_acpi_blockers": {
@@ -254,5 +264,18 @@
     "gtdt_timer_interrupt_match": false,
     "status": "BLOCKER_NEEDS_AURORA_ACPI_PORT"
   },
-  "hardware_boot_approved": false
+  "hardware_boot_approved": false,
+  "mmio_corrections": {
+    "vidc_venus_window_expanded": true,
+    "previous": [
+      "0x05a00000",
+      "0x000f0000"
+    ],
+    "cp2a": [
+      "0x05a00000",
+      "0x00200000"
+    ],
+    "overlap_with_next_named_uefi_mmio": false,
+    "next_named_uefi_mmio_start": "0x05e00000"
+  }
 }

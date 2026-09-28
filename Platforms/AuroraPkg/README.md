@@ -428,3 +428,20 @@ architected timer PPIs as 1/2/3/0. GICD/GICR addresses themselves match.
 These differences are recorded as **ACPI blockers**, not automatically
 rewritten, because the DT PPI-to-ACPI GSIV interpretation must be reviewed
 before generating Aurora-specific MADT/GTDT tables.
+
+### CP2A MMIO follow-up: VIDC/VENUS window corrected
+
+A second pass over the base DTB found one inherited MMIO window that was
+too small rather than merely broader than the DTB. The CP2A node
+`qcom,vidc@5a00000` publishes `reg = <0x05A00000 0x00200000>`, while
+Aurora still inherited a `VENUS` MMIO descriptor of only
+`0x05A00000..0x05AF0000` (0xF0000 bytes).
+
+Aurora now maps the full CP2A **2 MiB** VIDC window
+`0x05A00000..0x05C00000`. It does not overlap the next named UEFI MMIO
+window (MDSS starts at `0x05E00000`). CI now requires the full VIDC
+range to remain covered.
+
+This is a static MMIO-map correction only. It does not prove that the
+inherited Qualcomm VIDC driver is usable on Aurora, nor does it change the
+remaining ACPI and pre-Linux relocation blockers.

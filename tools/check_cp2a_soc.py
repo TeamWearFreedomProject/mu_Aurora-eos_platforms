@@ -53,6 +53,7 @@ def check(d):
       "PMIC ARB SPMI":(0x01c40000,0x02360000),
       "QUPV3_0_QUPV3_ID_1":(0x04a98000,0x0003a000),
       "USB30_PRIM":(0x04e00000,0x00100000),
+      "VENUS":(0x05a00000,0x00200000),
       "MDSS":(0x05e00000,0x00120000),
       "DISP_CC_DISP_CC":(0x05f00000,0x00020000),
       "SMMU":(0x0c600000,0x001f2020),
@@ -69,6 +70,9 @@ def check(d):
     assert d["gic"]["aurora_memory_map_exact_match"] is True
     assert d["uart"]["pcd_base_exact_match"] is True
     assert d["timer"]["cp2a_dtb_interrupt_encoding_matches_inherited_gtdt"] is False
+    assert d["mmio_corrections"]["vidc_venus_window_expanded"] is True
+    assert d["mmio_corrections"]["previous"] == ["0x05a00000","0x000f0000"]
+    assert d["mmio_corrections"]["cp2a"] == ["0x05a00000","0x00200000"]
 
     a=d["inherited_acpi_blockers"]
     assert a["apic_cpu_mpidr_match"] is False
