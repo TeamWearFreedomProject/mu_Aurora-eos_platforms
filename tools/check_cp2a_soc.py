@@ -77,7 +77,9 @@ def check(d):
     a=d["inherited_acpi_blockers"]
     assert a["apic_cpu_mpidr_match"] is False
     assert a["gtdt_timer_interrupt_match"] is False
-    assert a["status"]=="APIC_GTDT_LOCALLY_PORTED_OTHER_ACPI_AND_MSI_STILL_UNVERIFIED"\n    assert d["aurora_acpi_port"]["local_apic_generated"] is True\n    assert d["aurora_acpi_port"]["local_gtdt_generated"] is True
+    assert a["status"]=="APIC_GTDT_LOCALLY_PORTED_OTHER_ACPI_AND_MSI_STILL_UNVERIFIED"
+    assert d["aurora_acpi_port"]["local_apic_generated"] is True
+    assert d["aurora_acpi_port"]["local_gtdt_generated"] is True
     assert d["hardware_boot_approved"] is False
     return True
 
