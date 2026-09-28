@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "source_description": "User-uploaded Pixel Watch 2 CP2A boot.img; derived facts only, raw image not committed.",
+  "boot_image_sha256": "01c93386c44e7e0637c09b24340797d4dbca4986717ba2912f278f991c8ff3c1",
+  "image_size_bytes": 67108864,
+  "android_boot_header_version": 4,
+  "header_size_bytes": 1584,
+  "kernel_size_bytes": 36731392,
+  "ramdisk_size_bytes": 0,
+  "boot_signature_size_bytes": 0,
+  "kernel_sha256": "0ab5d6680d061f3d36f34078668aa2f14f08a5da729e31c19553554f4cbd3b42",
+  "arm64_image_magic": "ARMd",
+  "arm64_image_size_field": "0x23a0000",
+  "build_fingerprint": "google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys",
+  "boot_os_version": "17",
+  "boot_security_patch": "2026-06-05",
+  "linux_version": "6.6.118-android15-8-ge6d21220be73-ab15042318-4k",
+  "avb_footer_magic_present": true,
+  "comparison_to_supplied_cp1a": {
+    "cp1a_boot_image_sha256": "a6538bca72bbc91a910b923be08126f70915f5ffef942a0ea1fcc8fcc3e5bb3d",
+    "cp1a_kernel_sha256": "6d9e2f02da2d18dfc132749e022a3fe0df9add27b979af590d71d2fcd9bd4f03",
+    "cp1a_kernel_size_bytes": 36665856,
+    "kernel_size_delta_bytes": 65536,
+    "cp1a_linux_version": "6.6.102-android15-8-gb10d63bc1566-ab14419598-4k",
+    "kernel_identical": false
+  },
+  "inherited_repo_bootstrap": {
+    "path": "ImageResources/bootstrap.bin",
+    "git_blob_sha": "cdfe117ba4338610a442c8227ba5b8d549f13240",
+    "size_bytes": 35520512,
+    "size_delta_vs_cp2a_stock_kernel_bytes": -1210880,
+    "exact_stock_cp2a_kernel_match": false,
+    "note": "Size alone proves bootstrap.bin is not the uploaded CP2A stock kernel. Content/provenance still needs separate review."
+  },
+  "implications": {
+    "cp2a_boot_component_identity_verified": true,
+    "cp2a_stock_kernel_exactly_matches_inherited_bootstrap": false,
+    "current_aurora_generated_v4_signature_layout_matches_stock_cp2a": false,
+    "reason_signature_layout": "Current in-tree mkbootimg writes a 4096-byte zero GKI signature placeholder; uploaded stock CP2A boot header advertises signature size 0.",
+    "bootshim_relocation_verified": false,
+    "hardware_boot_approved": false
+  }
+}

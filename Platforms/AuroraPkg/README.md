@@ -234,3 +234,45 @@ That narrows the first-boot problem:
 The derived comparison is stored in
 `Research/cp1a_cp2a_dtbo_evolution.json` and guarded by CI. This does not
 turn the generated image into a hardware-tested image.
+
+## Verified uploaded CP2A stock boot.img: bootstrap mismatch confirmed
+
+The user-uploaded CP2A Watch 2 boot image (SHA-256
+`01c93386c44e7e0637c09b24340797d4dbca4986717ba2912f278f991c8ff3c1`)
+contains the internal fingerprint:
+
+```
+google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys
+```
+
+It is Android boot header **v4**, 64 MiB total, with a **36,731,392-byte**
+kernel, no ramdisk, and **boot signature size 0**. The kernel SHA-256 is
+`0ab5d6680d061f3d36f34078668aa2f14f08a5da729e31c19553554f4cbd3b42`
+and identifies itself as
+`6.6.118-android15-8-ge6d21220be73-ab15042318-4k`.
+Its boot security-patch property is `2026-06-05`.
+
+This is a real change from the supplied CP1A Watch 2 boot image:
+the CP1A kernel is 36,665,856 bytes and Linux
+`6.6.102-android15-8-gb10d63bc1566-ab14419598-4k`; CP2A is exactly
+**65,536 bytes larger** and has a different kernel hash.
+
+Most importantly for this UEFI port, the inherited repository
+`ImageResources/bootstrap.bin` is **35,520,512 bytes**. Therefore it
+cannot be byte-identical to the uploaded CP2A stock kernel
+(36,731,392 bytes); the size differs by **1,210,880 bytes**.
+The bootstrap is inherited from the upstream Seluna "Base Package A"
+packaging flow and its exact Aurora compatibility remains unverified.
+
+There is also a structural packaging mismatch: the uploaded stock CP2A
+boot header advertises a v4 boot-signature section size of **0**, while
+the current in-tree `mkbootimg.py` always emits a **4096-byte zero-filled**
+placeholder for generated v4 images. This does not by itself prove why a
+temporary boot would succeed or fail, but it gives us a concrete packaging
+difference to fix/test offline before any hardware attempt.
+
+Derived facts are stored in
+`Research/supplied_cp2a_boot.json` and guarded by CI. BootShim relocation
+at `0x5FC41000`, full base-DTB/SMEM ownership, AVB behavior for the
+experimental image, and recovery remain unverified; current output is still
+**DO NOT FASTBOOT BOOT / DO NOT FLASH**.
