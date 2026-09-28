@@ -165,3 +165,14 @@ or raw complete device tree is necessary for the next code review.
 pre-boot physical allocation map nor a complete bootloader/TrustZone
 memory layout. CP3A genuine bootloader relocation and ACPI still need
 independent evidence before any experimental fastboot boot.
+
+### Old and new reserved-memory nodes in the CP3A live listing
+
+The owner's running CP3A DTFS directory includes both `video_region@50900000`
+and `video_region@52900000`, both `adsp_regions@51000000` and
+`adsp_regions@53000000`, plus older/newer IPA/GPU node names.
+These names **do not establish which ranges are active**; the audit now
+checks each node's `status` and ignores explicit `disabled` nodes.
+Actual binary `reg` values override the often stale node-name addresses.
+A full read-only subtree capture is required to determine overlaps, and
+its resulting lack of overlaps still does not establish bootloader safety.

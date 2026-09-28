@@ -52,9 +52,16 @@ def parse_live_tree(root: Path):
         raise ValueError(f"reserved-memory directory missing: {root}")
     ac = cell_count(root / "#address-cells", "address cells")
     sc = cell_count(root / "#size-cells", "size cells")
-    fixed, dynamic = [], []
+    fixed, dynamic, disabled = [], [], []
     for node in sorted(root.iterdir(), key=lambda n: n.name):
         if not node.is_dir():
+            continue
+        # Older and newer reserved-memory nodes can coexist in the merged
+        # DT. A disabled node's reg does NOT establish an active carveout.
+        status_file = node / "status"
+        status = status_file.read_bytes().rstrip(b"\\x00").decode("ascii") if status_file.is_file() else "okay"
+        if status == "disabled":
+            disabled.append(node.name)
             continue
         reg, size = node / "reg", node / "size"
         if reg.is_file():
@@ -65,7 +72,7 @@ def parse_live_tree(root: Path):
             dynamic.append(node.name)
     if not fixed:
         raise ValueError("no fixed reserved-memory nodes; snapshot incomplete")
-    return fixed, dynamic
+    return fixed, dynamic, disabled
 
 def overlaps(a, b):
     return a["start"] < b["end"] and b["start"] < a["end"]
@@ -80,7 +87,7 @@ def audit(snapshot: Path, *, memory_source: Path = MAP):
     metadata = json.loads(metadata_file.read_text(encoding="utf-8-sig"))
     if metadata.get("device") != "aurora" or metadata.get("fingerprint") != EXPECTED_FP:
         raise ValueError("not the observed Aurora CP3A build: never mix firmware versions")
-    fixed, dynamic = parse_live_tree(snapshot / "reserved-memory")
+    fixed, dynamic, disabled = parse_live_tree(snapshot / "reserved-memory")
     entries = parse_uefi_map(memory_source.read_text(encoding="utf-8"))
     alloc = [e for e in entries if e["resource"] == "SYS_MEM" and
              e["kind"] in ("Conv", "BsData", "RtData", "BsCode", "RtCode") and
@@ -105,6 +112,7 @@ def audit(snapshot: Path, *, memory_source: Path = MAP):
         "source": "running Linux's DTFS reserved-memory subtree, read-only adb pull",
         "fixed_regions": safe_region_data,
         "dynamic_reservation_nodes_unknown_addresses": dynamic,
+        "disabled_nodes_ignored": disabled,
         "observed_conflicts_with_inherited_uefi_map": conflicts,
         "bootshim_relocation_base_inherited": "0x5fc41000",
         "verdict": "CONFLICTS_OBSERVED" if conflicts else "INCONCLUSIVE_NO_OBSERVED_STATIC_CONFLICTS",

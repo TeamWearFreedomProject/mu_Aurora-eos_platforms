@@ -45,6 +45,15 @@ class TestRuntimeAudit(unittest.TestCase):
         self.assertTrue(any(x["uefi_region"] == "DXE Heap"
                         for x in r["observed_conflicts_with_inherited_uefi_map"]))
 
+    def test_disabled_legacy_variant_not_counted_active(self):
+        self.add_fixed("splash", 0x5c000000, 0xf00000)
+        old = self.add_fixed("old-adsp@5fc41000", 0x5fc41000, 0x10000)
+        (old / "status").write_bytes(b"disabled\\x00")
+        r = tool.audit(self.path)
+        self.assertEqual(r["observed_conflicts_with_inherited_uefi_map"], [])
+        self.assertIn("old-adsp@5fc41000", r["disabled_nodes_ignored"])
+        self.assertFalse(r["hardware_boot_approved"])
+
     def test_dynamic_region_address_not_inferred(self):
         self.add_fixed("splash", 0x5c000000, 0xf00000)
         pool = self.dt / "linux,cma"
