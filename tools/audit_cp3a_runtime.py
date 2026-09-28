@@ -59,7 +59,7 @@ def parse_live_tree(root: Path):
         # Older and newer reserved-memory nodes can coexist in the merged
         # DT. A disabled node's reg does NOT establish an active carveout.
         status_file = node / "status"
-        status = status_file.read_bytes().rstrip(b"\\x00").decode("ascii") if status_file.is_file() else "okay"
+        status = status_file.read_bytes().rstrip(bytes([0])).decode("ascii") if status_file.is_file() else "okay"
         if status == "disabled":
             disabled.append(node.name)
             continue
