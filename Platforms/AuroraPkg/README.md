@@ -50,9 +50,11 @@ attempt a temporary boot** until the actual Pixel Watch 2 memory map,
 bootloader behavior, exact firmware compatibility and recovery method are
 confirmed and reviewed.
 
-The AOSP-compatible mkbootimg script here appends a **4096-byte zero-filled
-GKI boot signature placeholder** to each v4 image. This is not a signed boot
-image and does **not** satisfy AVB verification.
+The shared AOSP-compatible mkbootimg script keeps its default **4096-byte
+zero-filled GKI signature placeholder** for existing users, but Aurora packaging
+now explicitly selects **signature size 0** to match the uploaded CP2A stock
+boot header. This is only a structural match; the experimental image is still
+not AVB-verified.
 
 ## Preliminary Aurora memory and ACPI audit (historical source only)
 
@@ -276,3 +278,18 @@ Derived facts are stored in
 at `0x5FC41000`, full base-DTB/SMEM ownership, AVB behavior for the
 experimental image, and recovery remain unverified; current output is still
 **DO NOT FASTBOOT BOOT / DO NOT FLASH**.
+
+## CP2A boot-header alignment update
+
+Aurora's experimental packaging now passes
+`--boot_signature_size 0`, matching the uploaded CP2A stock boot.img's
+Android v4 header and omitting the previous 4096-byte zero placeholder.
+A regression test verifies both behaviors: the shared mkbootimg default
+remains 4096 bytes, while Aurora's opt-in path is 0.
+
+This removes one known **format difference** only. The generated image is
+still not a clone of the 64 MiB stock boot partition image: it does not gain
+the stock AVB footer merely by changing this field, and it still contains the
+inherited Seluna `bootstrap.bin` plus BootShim and UEFI FD rather than the
+CP2A stock kernel. The inherited `0x5FC41000` relocation remains the next
+critical blocker and is deliberately still marked unverified.

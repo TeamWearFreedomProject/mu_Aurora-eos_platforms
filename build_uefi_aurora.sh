@@ -27,7 +27,10 @@ for variant in secureboot nosb; do
         exit 1
     }
     cat "$bootstrap" "$shim" "$fd" > "$payload"
-    python3 ImageResources/mkbootimg.py --kernel "$payload" -o "$img" --header_version 4
+    # Uploaded CP2A stock boot.img advertises a v4 signature section size of 0.
+    # Match that header/data layout only; this does NOT make the image AVB trusted.
+    python3 ImageResources/mkbootimg.py --kernel "$payload" -o "$img" \
+      --header_version 4 --boot_signature_size 0
     python3 tools/validate_aurora_bootimg.py \
       --bootstrap "$bootstrap" --shim "$shim" --fd "$fd" \
       --payload "$payload" --image "$img" --manifest "$manifest"

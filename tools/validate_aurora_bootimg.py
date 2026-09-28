@@ -11,6 +11,7 @@ HEADER_PAGE = 4096
 MAX_BOOT_IMAGE = 64 * 1024 * 1024
 EXPECTED_FD_SIZE = 0x002BF000
 INHERITED_RELOCATION = 0x5FC41000
+EXPECTED_BOOT_SIGNATURE_SIZE = 0
 
 def sha256_file(path, offset=0, count=None):
     h = hashlib.sha256()
@@ -50,7 +51,7 @@ def main():
 
     expected_kernel_size = sum(x.stat().st_size for x in parts)
     assert a.payload.stat().st_size == expected_kernel_size
-    if HEADER_PAGE + ((expected_kernel_size + 4095) // 4096) * 4096 + 4096 > MAX_BOOT_IMAGE:
+    if HEADER_PAGE + ((expected_kernel_size + 4095) // 4096) * 4096 + EXPECTED_BOOT_SIGNATURE_SIZE > MAX_BOOT_IMAGE:
         raise ValueError("combined image exceeds 64 MiB preliminary size limit")
 
     with a.payload.open("rb") as payload:
@@ -74,16 +75,12 @@ def main():
         assert ramdisk_size == 0, "unexpected ramdisk in experimental image"
         assert kernel_size == expected_kernel_size, "kernel size mismatch"
 
-    # The in-tree mkbootimg.py appends a 4096-byte GKI boot signature
-    # placeholder even when no signing key is provided. It contains zeros,
-    # not an authenticated signature; this does NOT establish AVB trust.
+    # Match the uploaded CP2A stock boot header's signature-section layout:
+    # size 0 and therefore no appended GKI signature bytes.
     sig_size = struct.unpack_from("<I", header, 1580)[0]
-    assert sig_size == 4096, "unexpected v4 signature-section size"
+    assert sig_size == EXPECTED_BOOT_SIGNATURE_SIZE, "unexpected v4 signature-section size"
     expected_img_size = HEADER_PAGE + ((kernel_size + 4095) // 4096) * 4096 + sig_size
     assert a.image.stat().st_size == expected_img_size, "boot image size mismatch"
-    with a.image.open("rb") as img:
-        img.seek(expected_img_size - sig_size)
-        assert img.read(sig_size) == bytes(sig_size), "unsigned placeholder differs"
     payload_sha = sha256_file(a.payload)
     image_kernel_sha = sha256_file(a.image, HEADER_PAGE, kernel_size)
     assert image_kernel_sha == payload_sha, "packaged payload SHA256 mismatch"
@@ -96,11 +93,11 @@ def main():
         "CP2A_UPLOADED_DTBO_COMPONENT_IDENTIFIED": True,
         "CP2A_FULL_FIRMWARE_COMPATIBILITY_VERIFIED": False,
         "STOCK_CP2A_BOOT_SIGNATURE_SIZE_BYTES": 0,
-        "PACKAGING_MATCHES_STOCK_CP2A_SIGNATURE_LAYOUT": False,
+        "PACKAGING_MATCHES_STOCK_CP2A_SIGNATURE_LAYOUT": True,
         "HARDWARE_TESTED": False,
         "SAFE_TO_FLASH": False,
         "AVB_VERIFIED": False,
-        "GKI_BOOT_SIGNATURE": "4096-byte ZERO placeholder (NOT SIGNED)",
+        "GKI_BOOT_SIGNATURE": "absent; v4 header signature size is 0 (matches uploaded CP2A stock layout)",
         "BOOTSTRAP_PROVENANCE": "inherited upstream Seluna Base Package A asset; not the uploaded CP2A stock kernel",
         "BOOTSTRAP_EXACT_STOCK_CP2A_KERNEL_MATCH": False,
         "BOOTSHIM_MEMORY_RELOCATION_VERIFIED_FOR_WATCH2": False,
@@ -114,7 +111,7 @@ def main():
         "component_sha256": {x.name: sha256_file(x) for x in parts},
         "checks": ["ARM64 BootShim header", "inherited FD size",
                    "Android boot v4 header", "exact component concat",
-                   "packaged payload SHA256", "empty GKI signature placeholder", "64MiB preliminary size limit"]
+                   "packaged payload SHA256", "CP2A-style zero signature section", "64MiB preliminary size limit"]
     }
     a.manifest.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(f"PASS: {a.image.name} validated structurally; NOT HARDWARE VERIFIED")

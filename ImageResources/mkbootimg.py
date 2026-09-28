@@ -125,8 +125,9 @@ def write_header_v3_and_above(args):
     args.output.write(pack(f'{BOOT_ARGS_SIZE + BOOT_EXTRA_ARGS_SIZE}s',
                            args.cmdline))
     if args.header_version >= 4:
-        # The signature used to verify boot image v4.
-        args.output.write(pack('I', BOOT_IMAGE_V4_SIGNATURE_SIZE))
+        # The signature used to verify boot image v4. Some stock images,
+        # including the observed Aurora CP2A boot.img, advertise size 0.
+        args.output.write(pack('I', args.boot_signature_size))
     pad_file(args.output, BOOT_IMAGE_HEADER_V3_PAGESIZE)
 
 
@@ -543,6 +544,10 @@ def parse_cmdline():
                         help='other hash arguments passed to avbtool')
     parser.add_argument('--gki_signing_avbtool_path',
                         help='path to avbtool for boot signature generation')
+    parser.add_argument('--boot_signature_size', type=parse_int,
+                        choices=[0, BOOT_IMAGE_V4_SIGNATURE_SIZE],
+                        default=BOOT_IMAGE_V4_SIGNATURE_SIZE,
+                        help='boot v4 signature section size; 0 omits it')
     parser.add_argument('--vendor_boot', type=FileType('wb'),
                         help='vendor boot output file name')
     parser.add_argument('--vendor_ramdisk', type=FileType('rb'),
@@ -576,6 +581,11 @@ def add_boot_image_signature(args, pagesize):
     device boots.
     """
     args.output.flush()  # Flush the buffer for signature calculation.
+
+    if args.boot_signature_size == 0:
+        if args.gki_signing_key or args.gki_signing_algorithm:
+            raise ValueError('cannot sign a boot image with --boot_signature_size 0')
+        return
 
     # Appends zeros if the signing key is not specified.
     if not args.gki_signing_key or not args.gki_signing_algorithm:
