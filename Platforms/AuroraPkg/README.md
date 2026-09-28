@@ -445,3 +445,25 @@ range to remain covered.
 This is a static MMIO-map correction only. It does not prove that the
 inherited Qualcomm VIDC driver is usable on Aurora, nor does it change the
 remaining ACPI and pre-Linux relocation blockers.
+
+## Aurora ACPI milestone: MADT + GTDT split from Seluna
+
+Aurora now generates its own MADT/APIC and GTDT instead of packaging the
+inherited PW3 copies.
+
+From the matching CP2A base DTBs:
+- CPU MPIDRs are **0,1,2,3**.
+- PMU PPI6 maps to **GSIV 22**.
+- GIC maintenance PPI9 maps to **GSIV 25**.
+- Architected timer PPIs **1,2,3,0** map to GSIV
+  **17,18,19,16** and are level-low.
+- The memory timer remains at `0x0F120000` with GSIV **40/39**.
+- GICD/GICR remain `0x0F200000` / `0x0F300000`.
+
+The generator checks ACPI length/checksum and CI verifies the exact CPU,
+GIC and timer fields. The inherited MSI frame is intentionally preserved
+as **unverified** rather than deleted on absence-of-DT evidence.
+
+This removes two of the largest known Seluna ACPI mismatches, but the
+remaining ACPI tables and `0x5FC41000` pre-Linux ownership remain
+research blockers. Output remains DO-NOT-BOOT / DO-NOT-FLASH.

@@ -262,7 +262,7 @@
     "apic_gic_msi_frame_base": "0x0f210000",
     "cp2a_base_dtb_has_gic_msi_frame_node": false,
     "gtdt_timer_interrupt_match": false,
-    "status": "BLOCKER_NEEDS_AURORA_ACPI_PORT"
+    "status": "APIC_GTDT_LOCALLY_PORTED_OTHER_ACPI_AND_MSI_STILL_UNVERIFIED"
   },
   "hardware_boot_approved": false,
   "mmio_corrections": {
@@ -277,5 +277,41 @@
     ],
     "overlap_with_next_named_uefi_mmio": false,
     "next_named_uefi_mmio_start": "0x05e00000"
+  },
+  "aurora_acpi_port": {
+    "local_apic_generated": true,
+    "local_gtdt_generated": true,
+    "cp2a_cpu_mpidrs": [
+      "0x0",
+      "0x1",
+      "0x2",
+      "0x3"
+    ],
+    "gicc_performance_interrupt_gsiv": 22,
+    "gicc_virtual_gic_interrupt_gsiv": 25,
+    "architected_timer_gsivs": {
+      "secure_el1": 17,
+      "nonsecure_el1": 18,
+      "virtual": 19,
+      "nonsecure_el2": 16
+    },
+    "architected_timer_flags": "level-triggered, active-low (0x2)",
+    "memory_timer_gsivs": {
+      "physical": 40,
+      "virtual": 39
+    },
+    "gicd": "0x0f200000",
+    "gicr": "0x0f300000",
+    "inherited_msi_frame_retained_but_verified": false,
+    "remaining_inherited_tables": [
+      "CSRT",
+      "DBG2",
+      "DSDT",
+      "IORT",
+      "MCFG",
+      "PPTT",
+      "SSDT"
+    ],
+    "status": "PARTIAL_AURORA_ACPI_PORT_RESEARCH_ONLY"
   }
-}
+}\n
