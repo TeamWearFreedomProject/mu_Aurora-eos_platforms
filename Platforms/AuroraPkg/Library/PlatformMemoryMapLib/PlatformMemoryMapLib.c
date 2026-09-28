@@ -11,8 +11,9 @@ static ARM_MEMORY_REGION_DESCRIPTOR_EX gDeviceMemoryDescriptorEx[] = {
     /* DDR Regions */
     /* DDR Bank 0 Start */
     {"Kernel",            0x40000000, 0x05700000, AddMem, SYS_MEM, SYS_MEM_CAP, Reserv, WRITE_BACK_XN},
-    /* Historical early PW2 DTS reservations. Not validated against 2026
-     * Aurora LTE bootloader/SMEM. This remains DO-NOT-FLASH. */
+    /* Fixed reservations now cross-checked against the uploaded CP2A
+     * Aurora Wi-Fi vendor_kernel_boot base DTBs plus matching DTBO.
+     * Pre-Linux ownership and dynamic pools remain unverified. */
     {"ODA Reserved",      0x45700000, 0x00300000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv, WRITE_BACK_XN},
     {"DeepSleepBackup",   0x45A00000, 0x00100000, AddMem, MEM_RES, WRITE_COMBINEABLE, Reserv, UNCACHED_UNBUFFERED_XN},
     {"HYP",               0x45B00000, 0x00300000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv, WRITE_BACK_XN},
@@ -44,13 +45,14 @@ static ARM_MEMORY_REGION_DESCRIPTOR_EX gDeviceMemoryDescriptorEx[] = {
     {"TZ stat",           0x60000000, 0x00100000, NoHob,  SYS_MEM, SYS_MEM_CAP, Reserv, WRITE_BACK_XN},
     {"Pimem",             0x60100000, 0x01E00000, NoHob,  SYS_MEM, SYS_MEM_CAP, Reserv, NS_DEVICE},
 
-    /* RAM partition regions */
-#if USE_MEMORY_FOR_SERIAL_OUTPUT == 1
+    /* CP2A DTBO adds no-map ramoops at 0x61F00000..0x62300000 on all
+     * 11 overlays. Reserve it even when memory serial output is disabled.
+     * It also adds no-map kinfo_mem at 0x62400000..0x62401000, so split
+     * allocatable RAM around that 4 KiB hole. */
     {"PStore",            0x61F00000, 0x00400000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv, WRITE_THROUGH_XN},
-    {"RAM Partition",     0x62300000, 0x1CB00000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN},
-#else
-    {"RAM Partition",     0x61F00000, 0x1CF00000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN},
-#endif
+    {"RAM Partition",     0x62300000, 0x00100000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN},
+    {"KInfo Reserved",    0x62400000, 0x00001000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv, WRITE_THROUGH_XN},
+    {"RAM Partition",     0x62401000, 0x1C9FF000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN}
     /* DDR Bank 0 End */
     /* Carveout Region (0x7EE00000 -> 0x7FFFFFFF, Size 0x01200000) */
     /* DDR Bank 1 Start */

@@ -29,7 +29,9 @@
       "0x60000000",
       "0x60100000"
     ],
-    "note": "No supplied CP2A DTBO fixed override covers 0x5fc41000..0x5ff00000. The 2023 base DTS also has no fixed reserved-memory node there. Absence of a node is not proof that boot firmware leaves the region free."
+    "note": "Matching CP2A vendor_kernel_boot provides two base DTBs. Neither has a fixed reserved-memory reg overlapping 0x5fc41000..0x5ff00000, but /memory reg is a zero placeholder, the memreserve table is empty, and active size-only reserved-memory pools use broad alloc-ranges. This still does not prove pre-Linux firmware leaves the relocation range free.",
+    "cp2a_vendor_kernel_boot_sha256": "ea6d8e296cdd66fbb356f1b1563f1ed393b089b3c08e0e5215bcc74a88e47d98",
+    "cp2a_base_dtb_obtained": true
   },
   "interpretation": {
     "stock_kernel_header_does_not_supply_bootshim_absolute_destination": true,
@@ -39,15 +41,20 @@
     "hardware_boot_approved": false
   },
   "required_next_evidence": [
-    "Matching CP2A vendor_kernel_boot.img: the supplied CP2A vendor_boot.img has dtb_size=0, and boot.img contains only a 72-byte empty FDT.",
-    "Pre-Linux bootloader/firmware memory ownership or equivalent evidence for 0x5fc41000..0x5ff00000.",
+    "Pre-Linux bootloader/TrustZone/firmware memory ownership (or an equivalent authoritative memory map) for 0x5fc41000..0x5ff00000.",
+    "Runtime-patched memory information from a safe read-only source when available; static base DTB /memory reg is zero.",
     "Recovery path review before any hardware boot experiment."
   ],
   "supplied_cp2a_partition_findings": {
     "vendor_boot_dtb_size_bytes": 0,
     "boot_embedded_fdt_total_size_bytes": 72,
     "init_boot_fdt_occurrences": 0,
-    "base_dtb_obtained": false,
-    "next_partition_to_inspect": "vendor_kernel_boot"
+    "vendor_kernel_boot_dtb_size_bytes": 463814,
+    "vendor_kernel_boot_base_dtb_count": 2,
+    "base_dtb_obtained": true,
+    "base_memory_reg_is_runtime_placeholder": true,
+    "base_memreserve_entry_count": 0,
+    "fixed_reserved_overlap_with_bootshim": false,
+    "dynamic_size_only_reserved_pools_present": true
   }
 }

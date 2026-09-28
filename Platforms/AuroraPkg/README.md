@@ -344,7 +344,59 @@ that partition. That public blob is **not CP2A provenance**, so it is only a
 map to where the missing evidence lives, not a substitute for the matching
 CP2A image.
 
-The next high-value artifact is therefore a matching **CP2A
-`vendor_kernel_boot.img`**. Until its DTB and pre-Linux ownership are
-checked, `0x5FC41000` remains unverified and hardware boot approval remains
-false.
+A matching **CP2A `vendor_kernel_boot.img`** has now been supplied and
+analyzed below. It provides the missing base DTBs, but it still does not prove
+pre-Linux ownership of `0x5FC41000`; hardware boot approval remains false.
+
+## CP2A vendor_kernel_boot: base DTBs finally obtained
+
+The uploaded 64 MiB CP2A `vendor_kernel_boot.img` has SHA-256
+`ea6d8e296cdd66fbb356f1b1563f1ed393b089b3c08e0e5215bcc74a88e47d98`.
+Its AVB property carries the same Aurora fingerprint
+`CP2A.260603.001.S1/15396605`.
+
+The vendor-boot-v4 header contains a **463,814-byte DTB section**, which is
+exactly two concatenated base FDTs:
+
+- **MonacoP**: `qcom,monacop`, MSM ID `0x205`, 231,933 bytes,
+  SHA-256 `dc3be209b62212779c6da1e4ec53c73fc1a3c5e72bca80c1c5b6b36e167fbf4e`.
+- **Monaco**: `qcom,monaco`, MSM ID `0x1e6`, 231,881 bytes,
+  SHA-256 `5468ec96fb2bd663866741ce318a52911364db68e19696921382919e26621c38`.
+
+They are almost identical: only five properties differ (root model,
+compatible, MSM ID, and two IPA status properties). Their fixed
+`/reserved-memory` layout is identical. Combined with the matching CP2A
+DTBO, we can now build a much stronger effective fixed-memory picture.
+
+### Important bug found in our UEFI map
+
+All **11 CP2A overlays** add:
+
+- `ramoops@61F00000`: `0x61F00000..0x62300000` (4 MiB, no-map)
+- `kinfo_mem@62400000`: `0x62400000..0x62401000` (4 KiB, no-map)
+
+The previous Aurora UEFI map exposed those addresses as allocatable RAM when
+memory serial output was disabled, and it exposed the 4 KiB kinfo hole even
+when PStore was enabled. That is a real static conflict. The map now always
+reserves the 4 MiB ramoops/PStore area and splits RAM around the 4 KiB kinfo
+hole. CI checks all **19 effective fixed CP2A regions** and has regression
+tests that fail if either address becomes allocatable again.
+
+This is the first CP2A evidence that required an actual memory-map correction,
+rather than merely confirming an inherited reservation.
+
+### Why 0x5FC41000 is still not verified
+
+The good news: neither CP2A base DTB has a fixed reserved-memory region
+overlapping `0x5FC41000..0x5FF00000`.
+
+The bad news: both base DTBs have `/memory/reg = <0 0 0 0>`, meaning usable
+RAM is expected to be patched at runtime, and their FDT memreserve tables are
+empty. They also describe active size-only dynamic reserved-memory pools with
+broad allocation ranges. Therefore absence of a fixed DT node at
+`0x5FC41000` is **not proof** that the bootloader/TrustZone/firmware leaves
+that range available before UEFI runs.
+
+So the missing artifact is no longer a DTB. The remaining blocker is
+**authoritative pre-Linux memory ownership / runtime-patched memory evidence**.
+Generated images remain DO-NOT-BOOT / DO-NOT-FLASH.

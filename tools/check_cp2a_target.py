@@ -11,7 +11,11 @@ def check(d):
     assert d["target_fingerprint"]=="google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys"
     assert d["status"]=="RESEARCH_ONLY_DO_NOT_BOOT_DO_NOT_FLASH"
     assert all(d["verified_from_uploaded_cp2a_images"].values())
+    assert d["verified_from_uploaded_cp2a_images"]["vendor_kernel_boot_component"] is True
+    assert d["verified_from_uploaded_cp2a_images"]["base_dtb_from_vendor_kernel_boot"] is True
     assert all(d["unverified"].values())
+    assert d["unverified"]["cp2a_effective_runtime_dtb"] is True
+    assert d["unverified"]["pre_linux_memory_ownership"] is True
     assert d["hardware_boot_approved"] is False
     assert d["previous_live_observation"]["firmware"]=="CP3A.260905.002.E1"
     return True

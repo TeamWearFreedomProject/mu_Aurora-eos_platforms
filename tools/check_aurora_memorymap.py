@@ -11,6 +11,8 @@ MAP = ROOT / "Platforms/AuroraPkg/Library/PlatformMemoryMapLib/PlatformMemoryMap
 FIXTURE = ROOT / "Platforms/AuroraPkg/Research/early_pw2_reserved_regions.json"
 RECENT_DTBO_FIXTURE = ROOT / "Platforms/AuroraPkg/Research/supplied_pw2_dtbo_reserved_regions.json"
 CP2A_DTBO_FIXTURE = ROOT / "Platforms/AuroraPkg/Research/supplied_cp2a_dtbo_reserved_regions.json"
+CP2A_BASE_DTB_FIXTURE = ROOT / "Platforms/AuroraPkg/Research/supplied_cp2a_vendor_kernel_boot_base_dtb.json"
+EXPECTED_CP2A_VKB_SHA256 = "ea6d8e296cdd66fbb356f1b1563f1ed393b089b3c08e0e5215bcc74a88e47d98"
 EXPECTED_CP2A_SHA256 = "5f91d117e34dc554a90891bedf52dfa5dc7ebc3f1c1f94e8edd769e6c70d3b31"
 EXPECTED_CP2A_FINGERPRINT = "google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys"
 # The newer fixture records *only* the six fixed overrides in dtbo.img.
@@ -41,6 +43,19 @@ def verify(text: str, data: dict):
             raise ValueError("historical source revision changed without review")
         required = 17
         source_label = "historical DTS"
+    elif "vendor_kernel_boot_sha256" in data:
+        if data["vendor_kernel_boot_sha256"] != EXPECTED_CP2A_VKB_SHA256:
+            raise ValueError("CP2A vendor_kernel_boot provenance changed without review")
+        if data.get("fingerprint") != EXPECTED_CP2A_FINGERPRINT:
+            raise ValueError("CP2A vendor_kernel_boot fingerprint mismatch")
+        if len(data.get("base_dtbs", [])) != 2:
+            raise ValueError("expected two CP2A base DTBs")
+        if data.get("overlay_evidence", {}).get("overlay_count") != 11:
+            raise ValueError("expected 11 CP2A overlays")
+        if not data.get("overlay_evidence", {}).get("ramoops_and_kinfo_present_in_all_overlays"):
+            raise ValueError("ramoops/kinfo overlay evidence missing")
+        required = 19
+        source_label = "CP2A effective base DTB + DTBO"
     elif "dtbo_sha256" in data:
         if data["dtbo_sha256"] == EXPECTED_CP2A_SHA256:
             if data.get("build_fingerprint") != EXPECTED_CP2A_FINGERPRINT:
@@ -104,11 +119,12 @@ def main():
         historical = verify(memory_map, json.loads(FIXTURE.read_text(encoding="utf-8")))
         recent = verify(memory_map, json.loads(RECENT_DTBO_FIXTURE.read_text(encoding="utf-8")))
         cp2a = verify(memory_map, json.loads(CP2A_DTBO_FIXTURE.read_text(encoding="utf-8")))
+        cp2a_base = verify(memory_map, json.loads(CP2A_BASE_DTB_FIXTURE.read_text(encoding="utf-8")))
     except (ValueError, OSError, KeyError) as exc:
         print("FAIL: " + str(exc), file=sys.stderr)
         return 1
-    print(f"PASS: {historical} 2023 DTS, {recent} CP1A DTBO and {cp2a} CP2A "
-          "fixed regions protected; CP2A complete bootloader memory map STILL UNVERIFIED")
+    print(f"PASS: {historical} 2023 DTS, {recent} CP1A DTBO, {cp2a} CP2A DTBO and "
+          f"{cp2a_base} CP2A effective fixed regions protected; pre-Linux ownership STILL UNVERIFIED")
     return 0
 
 if __name__ == "__main__":

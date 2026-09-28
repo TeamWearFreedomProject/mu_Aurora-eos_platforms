@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "source_description": "Derived from user-uploaded CP2A Pixel Watch 2 vendor_kernel_boot.img plus the already verified matching CP2A dtbo.img. Raw images are not committed.",
+  "vendor_kernel_boot_sha256": "ea6d8e296cdd66fbb356f1b1563f1ed393b089b3c08e0e5215bcc74a88e47d98",
+  "image_size_bytes": 67108864,
+  "fingerprint": "google/aurora/aurora:17/CP2A.260603.001.S1/15396605:user/release-keys",
+  "vendor_boot_header": {
+    "version": 4,
+    "page_size": 4096,
+    "kernel_load_address": "0x10008000",
+    "ramdisk_load_address": "0x11000000",
+    "vendor_ramdisk_size_bytes": 4912220,
+    "header_size_bytes": 2128,
+    "dtb_size_bytes": 463814,
+    "dtb_load_address": "0x11f00000",
+    "vendor_ramdisk_table_size_bytes": 108,
+    "vendor_ramdisk_table_entry_count": 1,
+    "vendor_ramdisk_table_entry_size_bytes": 108,
+    "bootconfig_size_bytes": 0
+  },
+  "avb": {
+    "original_image_size_bytes": 5390336,
+    "vbmeta_offset_bytes": 5390336,
+    "vbmeta_size_bytes": 640
+  },
+  "vendor_ramdisk": {
+    "compression": "LZ4 legacy",
+    "decompressed_size_bytes": 15933184,
+    "cpio_entry_count": 122
+  },
+  "base_dtbs": [
+    {
+      "index": 0,
+      "offset_in_dtb_section": 0,
+      "total_size_bytes": 231933,
+      "sha256": "dc3be209b62212779c6da1e4ec53c73fc1a3c5e72bca80c1c5b6b36e167fbf4e",
+      "model": "Qualcomm Technologies, Inc. MonacoP SoC",
+      "compatible": "qcom,monacop",
+      "qcom_msm_id": [
+        "0x205",
+        "0x10000"
+      ],
+      "qcom_board_id": [
+        "0x0",
+        "0x0"
+      ]
+    },
+    {
+      "index": 1,
+      "offset_in_dtb_section": 231933,
+      "total_size_bytes": 231881,
+      "sha256": "5468ec96fb2bd663866741ce318a52911364db68e19696921382919e26621c38",
+      "model": "Qualcomm Technologies, Inc. Monaco SoC",
+      "compatible": "qcom,monaco",
+      "qcom_msm_id": [
+        "0x1e6",
+        "0x10000"
+      ],
+      "qcom_board_id": [
+        "0x0",
+        "0x0"
+      ]
+    }
+  ],
+  "base_dtb_difference_summary": {
+    "differing_properties": 5,
+    "differences": [
+      "/ compatible",
+      "/ model",
+      "/ qcom,msm-id",
+      "/soc/qcom,ipa@0x5800000 status (disabled only on MonacoP base)",
+      "/soc/qcom,rmnet-ipa status (disabled only on MonacoP base)"
+    ],
+    "reserved_memory_fixed_layout_identical": true
+  },
+  "base_memory_node": {
+    "reg": [
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x0"
+    ],
+    "memreserve_entries": 0,
+    "interpretation": "Bootloader/runtime must patch usable RAM; static base DTB alone does not prove physical RAM ownership."
+  },
+  "dynamic_reserved_memory": {
+    "active_size_only_pool_count": 8,
+    "disabled_size_only_pool_count": 1,
+    "active_names": [
+      "mem_dump_region",
+      "user_contig_region",
+      "qseecom_region",
+      "qseecom_ta_region",
+      "non_secure_display_region",
+      "adsp_region",
+      "linux,cma",
+      "debug_kinfo_region"
+    ],
+    "disabled_names": [
+      "secure_display_region"
+    ],
+    "note": "These use size/alloc-ranges rather than fixed reg addresses. They are Linux dynamic allocation requests, not evidence that 0x5FC41000 is free before Linux."
+  },
+  "overlay_evidence": {
+    "cp2a_dtbo_sha256": "5f91d117e34dc554a90891bedf52dfa5dc7ebc3f1c1f94e8edd769e6c70d3b31",
+    "overlay_count": 11,
+    "ramoops_and_kinfo_present_in_all_overlays": true,
+    "old_video_adsp_ipa_gpu_nodes_explicitly_disabled": true
+  },
+  "fixed_regions": [
+    {
+      "name": "oda_region",
+      "start": "0x45700000",
+      "length": "0x00300000"
+    },
+    {
+      "name": "deepsleep_region",
+      "start": "0x45a00000",
+      "length": "0x00100000"
+    },
+    {
+      "name": "hyp_region",
+      "start": "0x45b00000",
+      "length": "0x00300000"
+    },
+    {
+      "name": "xbl_aop_mem",
+      "start": "0x45e00000",
+      "length": "0x0011b000"
+    },
+    {
+      "name": "sec_apps_region",
+      "start": "0x45fff000",
+      "length": "0x00001000"
+    },
+    {
+      "name": "smem",
+      "start": "0x46000000",
+      "length": "0x00200000"
+    },
+    {
+      "name": "wlan_msa_region",
+      "start": "0x46200000",
+      "length": "0x00100000"
+    },
+    {
+      "name": "modem_region",
+      "start": "0x4ab00000",
+      "length": "0x07e00000"
+    },
+    {
+      "name": "video_region",
+      "start": "0x52900000",
+      "length": "0x00700000"
+    },
+    {
+      "name": "adsp_regions",
+      "start": "0x53000000",
+      "length": "0x01900000"
+    },
+    {
+      "name": "ipa_fw_region",
+      "start": "0x54900000",
+      "length": "0x00010000"
+    },
+    {
+      "name": "ipa_gsi_region",
+      "start": "0x54910000",
+      "length": "0x00005000"
+    },
+    {
+      "name": "gpu_region",
+      "start": "0x54915000",
+      "length": "0x00002000"
+    },
+    {
+      "name": "splash_region",
+      "start": "0x5c000000",
+      "length": "0x00f00000"
+    },
+    {
+      "name": "dfps_data_region",
+      "start": "0x5cf00000",
+      "length": "0x00100000"
+    },
+    {
+      "name": "stats_region",
+      "start": "0x60000000",
+      "length": "0x00100000"
+    },
+    {
+      "name": "removed_region",
+      "start": "0x60100000",
+      "length": "0x01e00000"
+    },
+    {
+      "name": "ramoops",
+      "start": "0x61f00000",
+      "length": "0x00400000"
+    },
+    {
+      "name": "kinfo_mem",
+      "start": "0x62400000",
+      "length": "0x00001000"
+    }
+  ],
+  "relocation_observation": {
+    "bootshim_start": "0x5fc41000",
+    "bootshim_end": "0x5ff00000",
+    "fixed_region_overlap": false,
+    "relocation_verified": false,
+    "hardware_boot_approved": false
+  }
+}

@@ -11,6 +11,7 @@ class MemoryMapTests(unittest.TestCase):
         cls.regions = json.loads(audit.FIXTURE.read_text(encoding="utf-8"))
         cls.recent_dtbo = json.loads(audit.RECENT_DTBO_FIXTURE.read_text(encoding="utf-8"))
         cls.cp2a_dtbo = json.loads(audit.CP2A_DTBO_FIXTURE.read_text(encoding="utf-8"))
+        cls.cp2a_base = json.loads(audit.CP2A_BASE_DTB_FIXTURE.read_text(encoding="utf-8"))
 
     def test_historical_regions_protected(self):
         self.assertEqual(audit.verify(self.original, self.regions), 17)
@@ -20,6 +21,25 @@ class MemoryMapTests(unittest.TestCase):
 
     def test_cp2a_fixed_overrides_protected(self):
         self.assertEqual(audit.verify(self.original, self.cp2a_dtbo), 6)
+
+    def test_cp2a_effective_base_fixed_regions_protected(self):
+        self.assertEqual(audit.verify(self.original, self.cp2a_base), 19)
+
+    def test_cp2a_ramoops_is_never_allocatable(self):
+        changed = self.original.replace(
+            '0x61F00000, 0x00400000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv',
+            '0x61F00000, 0x00400000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv')
+        self.assertNotEqual(changed, self.original)
+        with self.assertRaises(ValueError):
+            audit.verify(changed, self.cp2a_base)
+
+    def test_cp2a_kinfo_is_never_allocatable(self):
+        changed = self.original.replace(
+            '0x62400000, 0x00001000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv',
+            '0x62400000, 0x00001000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv')
+        self.assertNotEqual(changed, self.original)
+        with self.assertRaises(ValueError):
+            audit.verify(changed, self.cp2a_base)
 
     def test_cp1a_cp2a_fixed_overrides_match(self):
         def regions(data):

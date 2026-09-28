@@ -31,8 +31,13 @@ def check(d):
     assert p["vendor_boot_dtb_size_bytes"]==0
     assert p["boot_embedded_fdt_total_size_bytes"]==72
     assert p["init_boot_fdt_occurrences"]==0
-    assert p["base_dtb_obtained"] is False
-    assert p["next_partition_to_inspect"]=="vendor_kernel_boot"
+    assert p["vendor_kernel_boot_dtb_size_bytes"]==463814
+    assert p["vendor_kernel_boot_base_dtb_count"]==2
+    assert p["base_dtb_obtained"] is True
+    assert p["base_memory_reg_is_runtime_placeholder"] is True
+    assert p["base_memreserve_entry_count"]==0
+    assert p["fixed_reserved_overlap_with_bootshim"] is False
+    assert p["dynamic_size_only_reserved_pools_present"] is True
     assert len(d["required_next_evidence"])>=2
     return True
 
