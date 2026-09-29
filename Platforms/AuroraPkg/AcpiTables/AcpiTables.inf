@@ -1,4 +1,4 @@
-# Aurora package: CP2A-local APIC/GTDT generated offline; remaining AML still inherited/unverified.
+# Aurora package: evidence-backed minimal CP2A-local ACPI core; inherited peripheral tables quarantined.
 ## @file
 #
 #  ACPI table data and ASL sources required to boot the platform.
@@ -18,22 +18,11 @@
 
 [Sources]
   FACP.aslc
-  #SoftwareTpm2Table.aslc
-  #SoftwareTpm2Device.asl
-  #SelfSignedDriverEnabler.asl
+  DSDT.asl
 
 [Binaries.AARCH64]
    ASL|AuroraPkg/AcpiTables/Generated/APIC.aml
-   ASL|SelunaACPI/5100/builtin/CSRT.aml
-   ASL|SelunaACPI/5100/builtin/DBG2.aml
-   ASL|SelunaACPI/5100/builtin/DSDT.aml
    ASL|AuroraPkg/AcpiTables/Generated/GTDT.aml
-   ASL|SelunaACPI/5100/builtin/IORT.aml
-   ASL|SelunaACPI/5100/builtin/MCFG.aml
-   ASL|SelunaACPI/5100/builtin/PPTT.aml
-   ASL|SelunaACPI/common/builtin/SSDT.aml
-   ASL|SelunaACPI/common/builtin/TPMDev.dat
-   ASL|SelunaACPI/common/builtin/SoftwareTpm2Table.aml
 
 [Packages]
   ArmPkg/ArmPkg.dec

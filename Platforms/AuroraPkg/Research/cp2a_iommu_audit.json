@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "target": "Pixel Watch 2 Wi-Fi / aurora / CP2A.260603.001.S1",
+  "source_vendor_kernel_boot_sha256": "ea6d8e296cdd66fbb356f1b1563f1ed393b089b3c08e0e5215bcc74a88e47d98",
+  "selected_base_dtb": "qcom,monacop / MSM ID 0x205 (matches Aurora 0x205xx DTBO family)",
+  "smmu": [
+    {
+      "name": "apps-smmu",
+      "path": "/soc/apps-smmu@0xc600000",
+      "compatible": "qcom,qsmmu-v500",
+      "reg": [
+        [
+          "0x0c600000",
+          "0x00080000"
+        ],
+        [
+          "0x0c7f2000",
+          "0x00000020"
+        ]
+      ],
+      "iommu_cells": 2,
+      "global_interrupt_spi": 81,
+      "context_interrupt_spi_range": [
+        "87",
+        "150"
+      ],
+      "context_interrupt_count": 64,
+      "dt_iommus_mapping_count": 33
+    },
+    {
+      "name": "kgsl-smmu",
+      "path": "/soc/kgsl-smmu@0x59a0000",
+      "compatible": [
+        "qcom,qsmmu-v500",
+        "qcom,adreno-smmu"
+      ],
+      "reg": [
+        [
+          "0x059a0000",
+          "0x00010000"
+        ],
+        [
+          "0x059da000",
+          "0x00000020"
+        ]
+      ],
+      "iommu_cells": 2,
+      "global_interrupt_spi": 163,
+      "context_interrupt_spi_range": [
+        "167",
+        "174"
+      ],
+      "context_interrupt_count": 8,
+      "dt_iommus_mapping_count": 3
+    }
+  ],
+  "dt_iommus_summary": {
+    "node_count_with_iommus_property": 29,
+    "total_mapping_tuples": 36,
+    "monacop_base_nodes_with_disabled_status_or_disabled_parent": 5,
+    "active_base_tree_mapping_tuples": 31
+  },
+  "representative_stream_ids": {
+    "usb_dwc3": [
+      "0x120"
+    ],
+    "qupv3_geni": [
+      "0xe3"
+    ],
+    "gpi_dma": [
+      "0xf6"
+    ],
+    "display_unsecure": [
+      "0x420"
+    ],
+    "display_secure": [
+      "0x421"
+    ],
+    "vidc_nonsecure": [
+      "0x860",
+      "0x880"
+    ],
+    "vidc_secure": [
+      "0x861",
+      "0x863",
+      "0x804"
+    ],
+    "kgsl_user": [
+      "0x0"
+    ],
+    "kgsl_secure": [
+      "0x2"
+    ],
+    "crypto": [
+      "0x86",
+      "0x96",
+      "0x92",
+      "0x98",
+      "0x9f",
+      "0x93",
+      "0x9c",
+      "0x9e"
+    ]
+  },
+  "iort_status": {
+    "inherited_seluna_iort_selected": false,
+    "local_iort_generated": false,
+    "reason": "DT stream IDs can be recovered, but an ACPI IORT also needs correct named-component/namespace mappings and SMMU node semantics for the Windows-visible devices. Those are not yet evidenced.",
+    "safe_action": "Quarantine the known-wrong inherited IORT; do not invent an Aurora IORT yet."
+  },
+  "hardware_boot_approved": false
+}

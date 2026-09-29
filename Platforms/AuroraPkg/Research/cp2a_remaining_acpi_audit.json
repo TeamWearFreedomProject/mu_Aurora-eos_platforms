@@ -5,15 +5,16 @@
   "selected_tables": {
     "local_cp2a_derived": [
       "APIC/MADT",
-      "GTDT"
+      "GTDT",
+      "DSDT"
     ],
     "local_platform_scaffold": [
       "FADT"
     ],
-    "inherited": [
+    "active_inherited": [],
+    "quarantined_inherited": [
       "CSRT",
       "DBG2",
-      "DSDT",
       "IORT",
       "MCFG",
       "PPTT",
@@ -24,7 +25,7 @@
   },
   "inherited_table_audit": {
     "DSDT": {
-      "verdict": "STRUCTURALLY_COMPATIBLE_CPU_ONLY_BUT_STILL_INHERITED",
+      "verdict": "REPLACED_BY_AURORA_LOCAL_CPU_ONLY_DSDT",
       "details": "Inherited DSDT contains only CPU0..CPU3, ACPI0007, UIDs 0..3. Those UIDs match CP2A's four CPUs and the Aurora-local MADT processor UIDs.",
       "hardware_blocker": false
     },
@@ -39,7 +40,8 @@
         "\\_SB.URS0"
       ],
       "namespace_verified": false,
-      "hardware_blocker": false
+      "hardware_blocker": false,
+      "selected_in_active_acpi": false
     },
     "PPTT": {
       "verdict": "CACHE_TOPOLOGY_MISMATCH_BLOCKER",
@@ -64,7 +66,8 @@
         399,
         400
       ],
-      "hardware_blocker": true
+      "hardware_blocker": true,
+      "selected_in_active_acpi": false
     },
     "IORT": {
       "verdict": "SMMU_BASE_MISMATCH_MAJOR_BLOCKER",
@@ -78,7 +81,8 @@
       ],
       "exact_base_match_count": 0,
       "note": "Inherited IORT cannot be treated as an Aurora DMA/IOMMU description.",
-      "hardware_blocker": true
+      "hardware_blocker": true,
+      "selected_in_active_acpi": false
     },
     "MCFG": {
       "verdict": "NO_CP2A_PCIE_EVIDENCE_AND_ECAM_OVERLAPS_MEMORY_BLOCKER",
@@ -100,38 +104,45 @@
       ],
       "cp2a_base_dtb_pci_or_pcie_nodes": 0,
       "note": "Do not trust inherited ECAM windows without independent Aurora PCIe evidence.",
-      "hardware_blocker": true
+      "hardware_blocker": true,
+      "selected_in_active_acpi": false
     },
     "CSRT": {
       "verdict": "UNVERIFIED_INHERITED",
-      "hardware_blocker": true
+      "hardware_blocker": true,
+      "selected_in_active_acpi": false
     },
     "SSDT": {
       "verdict": "UNVERIFIED_INHERITED_COMMON_TABLE",
-      "hardware_blocker": true
+      "hardware_blocker": true,
+      "selected_in_active_acpi": false
     },
     "TPMDev": {
       "verdict": "INHERITED_SOFTWARE_TPM_RESOURCE_UNAUDITED",
-      "hardware_blocker": false
+      "hardware_blocker": false,
+      "selected_in_active_acpi": false
     },
     "SoftwareTpm2Table": {
       "verdict": "INHERITED_SOFTWARE_TPM_TABLE_UNAUDITED",
-      "hardware_blocker": false
+      "hardware_blocker": false,
+      "selected_in_active_acpi": false
     }
   },
   "separation_status": {
     "cpu_interrupt_core_localized": true,
+    "local_cpu_namespace": true,
+    "active_seluna_acpi_binary_count": 0,
+    "inherited_tables_quarantined": true,
     "platform_peripheral_acpi_localized": false,
-    "inherited_table_count": 9,
+    "quarantined_table_count": 8,
     "major_remaining_blockers": [
-      "IORT",
-      "PPTT",
-      "MCFG",
-      "CSRT",
-      "SSDT"
+      "IORT_RECONSTRUCTION",
+      "PPTT_RECONSTRUCTION",
+      "PERIPHERAL_DSDT",
+      "FADT_RESET_VALIDATION"
     ],
-    "next_priority": "IORT",
-    "reason": "IORT is the DMA/IOMMU description and its inherited SMMU bases do not match either CP2A SMMU."
+    "next_priority": "IORT_RECONSTRUCTION",
+    "reason": "The wrong Seluna IORT is no longer active. CP2A supplies real SMMU bases and DT iommus stream IDs, but Windows/ACPI named-component mappings are still missing."
   },
   "hardware_boot_approved": false
 }

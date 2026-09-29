@@ -108,3 +108,33 @@ Aurora-local, peripheral ACPI is not.**
 Therefore the next large ACPI target is **IORT**, not cosmetic DSDT cleanup.
 Until Aurora's SMMU/device mappings are rebuilt, Windows DMA/IOMMU behavior
 cannot be treated as valid.
+
+## Minimal CP2A ACPI core: inherited binaries quarantined
+
+The audit above found that several inherited tables are not just unverified,
+but positively conflict with CP2A evidence. They are therefore no longer
+selected in Aurora's active ACPI package.
+
+The active table set is now deliberately small:
+
+- local FADT scaffold (reset semantics still unverified),
+- CP2A-derived local MADT/APIC,
+- CP2A-derived local GTDT,
+- Aurora-local CPU-only DSDT with CPU UIDs 0..3.
+
+The inherited Seluna **CSRT, DBG2, IORT, MCFG, PPTT, SSDT, TPMDev and
+SoftwareTpm2Table** are quarantined from the build. This does not mean those
+features are implemented; it prevents known-wrong or unevidenced tables from
+silently describing Watch 2 hardware.
+
+A new CP2A IOMMU audit records the two real SMMUs from the uploaded
+`vendor_kernel_boot.img`: apps-SMMU at `0x0C600000` and KGSL-SMMU at
+`0x059A0000`. The base DTB contains 29 nodes with `iommus` properties
+and 36 mapping tuples, including stream IDs for USB, QUP/GPI, display, VIDC,
+KGSL and crypto. This is enough to begin reconstructing IORT, but **not**
+enough to emit a trustworthy Windows IORT: ACPI named-component/namespace
+mappings are still missing.
+
+So "Seluna ACPI separation" is now much cleaner: **zero SelunaACPI binary
+tables are active**, while peripheral ACPI remains intentionally incomplete.
+This is a research/build milestone only; hardware boot approval remains false.
