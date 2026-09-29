@@ -1,5 +1,7 @@
 # Pixel Watch 2 (Aurora) UEFI port
 
+> ⭐︎ このプロジェクトは個人が **ChatGPTと協力して** 学習・実験として進めています。解析、コード、文書にもAIの支援を使っています。まだ開発途中なので、完成版の配布や個別サポートは約束できません。
+
 Pixel Watch 2 Wi-Fi（コードネーム **aurora**）向けの、実験中のUEFI移植プロジェクトです。Pixel Watch 3向け[WOA-Project/mu_seluna_platforms](https://github.com/WOA-Project/mu_seluna_platforms)を基にしています。**Windowsの起動や安定したUEFIメニュー表示は、まだ確認できていません。**
 
 > **現在の対象:** CP2A.260603.001.S1。実機はこの版に戻したとの報告がありますが、セットアップ後のADBによるビルド番号の再確認は未実施です。Pixel Watch 3用の手順・バイナリをPixel Watch 2にそのまま適用しないでください。
