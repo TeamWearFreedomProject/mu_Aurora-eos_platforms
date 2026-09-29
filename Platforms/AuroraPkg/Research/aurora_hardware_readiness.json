@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "target": "Pixel Watch 2 Wi-Fi / aurora / CP2A.260603.001.S1",
+  "purpose": "Offline research readiness ledger. It does not authorize hardware booting or flashing.",
+  "latest_evidence": {
+    "cp2a_boot": true,
+    "cp2a_dtbo": true,
+    "cp2a_init_boot": true,
+    "cp2a_vendor_boot": true,
+    "cp2a_vendor_kernel_boot": true,
+    "cp2a_base_dtb": true
+  },
+  "offline_checks": {
+    "build_and_packaging": "PASS",
+    "cp2a_boot_v4_layout": "PASS",
+    "fixed_reserved_memory_conflicts": "PASS_AFTER_RAMOOPS_KINFO_FIX",
+    "cp2a_soc_mmio_coverage": "PASS_AFTER_VIDC_FIX",
+    "minimal_cp2a_acpi_core": "PASS",
+    "inherited_seluna_acpi_active_count": 0,
+    "unevidenced_msi_frame_active": false,
+    "unevidenced_fadt_reset_register_active": false
+  },
+  "unresolved_blockers": [
+    {
+      "id": "BOOTSHIM_RELOCATION",
+      "detail": "0x5FC41000..0x5FF00000 is inherited from Seluna/Luna. No fixed DT overlap is observed, but pre-Linux bootloader/TrustZone ownership is not proven."
+    },
+    {
+      "id": "BOOTSTRAP_COMPATIBILITY",
+      "detail": "ImageResources/bootstrap.bin is exactly the upstream Seluna asset and is not the uploaded CP2A stock kernel; Aurora compatibility is unverified."
+    },
+    {
+      "id": "LIVE_TARGET_IDENTITY",
+      "detail": "No fresh live CP2A fingerprint/slot observation is available after downgrade because normal setup/ADB is unavailable."
+    },
+    {
+      "id": "BOOTLOADER_ACCEPTANCE",
+      "detail": "Experimental image is not stock-AVB authenticated; actual temporary-boot acceptance/policy has not been established offline."
+    },
+    {
+      "id": "RECOVERY_PATH",
+      "detail": "A current, verified recovery/backup path has not been recorded in project evidence."
+    }
+  ],
+  "not_required_for_first_uefi_entry_but_incomplete": [
+    "IORT/peripheral DMA mappings",
+    "PPTT cache topology",
+    "peripheral DSDT devices",
+    "Windows hardware IDs and drivers"
+  ],
+  "hardware_boot_approved": false,
+  "readiness": "NOT_READY_FOR_HARDWARE_TEST"
+}

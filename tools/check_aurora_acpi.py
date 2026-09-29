@@ -28,5 +28,7 @@ assert mod.VGIC_GSIV == 25
 assert mod.TIMER_GSIV == (17,18,19,16)
 assert mod.MEMTIMER_PHYS_GSIV == 40
 assert mod.MEMTIMER_VIRT_GSIV == 39
+assert len(apic) == 0x194
+assert b"\x0d\x18" not in apic[0x194:]
 
-print("PASS: Aurora uses generated CP2A-local APIC/GTDT; inherited PW3 APIC/GTDT are no longer selected")
+print("PASS: Aurora uses generated CP2A-local APIC/GTDT; inherited PW3 APIC/GTDT and unevidenced MSI frame are not selected")

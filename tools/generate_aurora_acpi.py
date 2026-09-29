@@ -85,16 +85,12 @@ def build_apic() -> bytes:
         0x0E, 0x10, 0, GICR_BASE, GICR_LENGTH
     )
 
-    # Keep the inherited MSI frame for now. CP2A base DT does not describe it,
-    # so this remains explicitly UNVERIFIED rather than silently removed.
-    body += struct.pack(
-        "<BBHIQIHH",
-        0x0D, 0x18, 0, 0, 0x0F210000, 0x1, 0x80, 0x340
-    )
-
+    # Do not advertise the inherited Seluna GIC MSI frame. CP2A base DT has
+    # no matching v2m/MSI-frame node, and the minimal Aurora ACPI package has
+    # no PCIe/IORT consumer that needs it. Re-add only with Aurora evidence.
     length = 36 + len(body)
     table = acpi_header(b"APIC", length, 5) + body
-    assert length == 0x1AC
+    assert length == 0x194
     return finish_checksum(table)
 
 
@@ -135,7 +131,7 @@ def build_gtdt() -> bytes:
 
 
 def validate(apic: bytes, gtdt: bytes) -> None:
-    assert apic[:4] == b"APIC" and len(apic) == 0x1AC and (sum(apic) & 0xFF) == 0
+    assert apic[:4] == b"APIC" and len(apic) == 0x194 and (sum(apic) & 0xFF) == 0
     assert gtdt[:4] == b"GTDT" and len(gtdt) == 0x9C and (sum(gtdt) & 0xFF) == 0
 
     # GICC MPIDRs and PMU/VGIC interrupt fields.
@@ -178,7 +174,7 @@ def main() -> int:
         (OUT / "GTDT.aml").write_bytes(gtdt)
         print(f"generated {OUT/'APIC.aml'} ({len(apic)} bytes)")
         print(f"generated {OUT/'GTDT.aml'} ({len(gtdt)} bytes)")
-    print("PASS: Aurora APIC/GTDT encode CP2A CPU/GIC/PMU/timer evidence; MSI frame remains UNVERIFIED")
+    print("PASS: Aurora APIC/GTDT encode CP2A CPU/GIC/PMU/timer evidence; unevidenced inherited MSI frame is quarantined")
     return 0
 
 if __name__ == "__main__":

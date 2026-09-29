@@ -1,4 +1,4 @@
-/* Aurora FADT scaffold: CP2A DT verifies PSCI 1.0 via SMC; ResetReg remains unverified. */
+/* Aurora FADT scaffold: CP2A DT verifies PSCI 1.0 via SMC; unknown inherited ResetReg is quarantined. */
 /** @file
 *  Fixed ACPI Description Table (FADT)
 *
@@ -56,14 +56,8 @@ EFI_ACPI_6_0_FIXED_ACPI_DESCRIPTION_TABLE Fadt = {
   0,                                            // UINT8      Reserved1
   EFI_ACPI_6_0_HW_REDUCED_ACPI |
   EFI_ACPI_6_0_LOW_POWER_S0_IDLE_CAPABLE,       // UINT32     Flags
-  {
-    EFI_ACPI_5_0_EMBEDDED_CONTROLLER,
-    0,
-    0,
-    EFI_ACPI_5_0_DWORD,
-    0x009020B4
-  },                                            // GAS        ResetReg
-  1,                                            // UINT8      ResetValue
+  NULL_GAS,                                     // GAS        ResetReg (not advertised without CP2A evidence)
+  0,                                            // UINT8      ResetValue
   EFI_ACPI_6_0_ARM_PSCI_COMPLIANT,              // UINT16     ArmBootArchFlags
   EFI_ACPI_6_0_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION,
                                                 // UINT8      MinorRevision
