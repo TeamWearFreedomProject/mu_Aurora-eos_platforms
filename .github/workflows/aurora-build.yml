@@ -113,6 +113,17 @@ jobs:
             ImageResources/Aurora/*.manifest.json
             BootShim/BootShim.Aurora.bin
 
+      - name: Publish CP2A fastboot-format candidates (UNVERIFIED)
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-CP2A-fastboot-candidate-UNVERIFIED
+          if-no-files-found: error
+          compression-level: 3
+          path: |
+            ImageResources/Aurora/aurora_cp2a_*_fastboot_candidate_UNVERIFIED.img
+            ImageResources/Aurora/aurora_cp2a_*_fastboot_candidate_UNVERIFIED.img.sha256
+            ImageResources/Aurora/aurora_cp2a_*_fastboot_candidate_UNVERIFIED.manifest.json
+
       - name: Publish build logs even when compilation fails
         if: always()
         uses: actions/upload-artifact@v4

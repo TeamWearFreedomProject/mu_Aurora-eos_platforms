@@ -34,5 +34,15 @@ for variant in secureboot nosb; do
     python3 tools/validate_aurora_bootimg.py \
       --bootstrap "$bootstrap" --shim "$shim" --fd "$fd" \
       --payload "$payload" --image "$img" --manifest "$manifest"
+
+    # Publish a clearly named Android boot-v4 image that is structurally
+    # suitable as a fastboot temporary-boot *candidate*. This alias does not
+    # imply hardware acceptance or boot success.
+    candidate="ImageResources/Aurora/aurora_cp2a_${variant}_fastboot_candidate_UNVERIFIED.img"
+    candidate_manifest="ImageResources/Aurora/aurora_cp2a_${variant}_fastboot_candidate_UNVERIFIED.manifest.json"
+    cp "$img" "$candidate"
+    cp "$manifest" "$candidate_manifest"
+    sha256sum "$candidate" > "${candidate}.sha256"
+
     rm -f "$payload"
 done

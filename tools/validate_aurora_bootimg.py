@@ -96,6 +96,10 @@ def main():
         "PACKAGING_MATCHES_STOCK_CP2A_SIGNATURE_LAYOUT": True,
         "HARDWARE_TESTED": False,
         "SAFE_TO_FLASH": False,
+        "FASTBOOT_BOOT_IMAGE_FORMAT_CANDIDATE": True,
+        "TEMPORARY_BOOT_ACCEPTANCE_VERIFIED": False,
+        "TEMPORARY_BOOT_SUCCESS_VERIFIED": False,
+        "CURRENT_BOOTLOADER_UNLOCK_STATE_VERIFIED": False,
         "HARDWARE_BOOT_READINESS": "NOT_READY_FOR_HARDWARE_TEST",
         "HARDWARE_BOOT_APPROVED": False,
         "UNRESOLVED_HARDWARE_BLOCKERS": [
@@ -123,7 +127,9 @@ def main():
         "component_sha256": {x.name: sha256_file(x) for x in parts},
         "checks": ["ARM64 BootShim header", "inherited FD size",
                    "Android boot v4 header", "exact component concat",
-                   "packaged payload SHA256", "CP2A-style zero signature section", "64MiB preliminary size limit"]
+                   "packaged payload SHA256", "CP2A-style zero signature section",
+                   "fastboot-compatible boot-image container format",
+                   "64MiB preliminary size limit"]
     }
     a.manifest.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(f"PASS: {a.image.name} validated structurally; NOT HARDWARE VERIFIED")

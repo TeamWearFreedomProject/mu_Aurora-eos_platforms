@@ -508,3 +508,23 @@ The machine-readable result lives in
 `Research/cp2a_remaining_acpi_audit.json`. CI keeps these remaining
 IORT/PPTT/MCFG issues marked as blockers. **IORT is the next major porting
 target.**
+
+## CP2A fastboot-format candidate artifact
+
+CI now publishes two explicitly named Android boot-v4 candidate images:
+
+- `aurora_cp2a_secureboot_fastboot_candidate_UNVERIFIED.img`
+- `aurora_cp2a_nosb_fastboot_candidate_UNVERIFIED.img`
+
+They are byte-for-byte aliases of the structurally validated Aurora images
+built from the current CP2A-local ACPI/MMIO/memory-map work. Each has a
+SHA-256 sidecar and JSON manifest. The manifest marks the image as a
+`FASTBOOT_BOOT_IMAGE_FORMAT_CANDIDATE`, but deliberately leaves temporary
+boot acceptance and boot success **unverified**.
+
+This wording matters: Android boot header v4 packaging can be checked offline,
+but the current project still lacks authoritative evidence for the inherited
+`bootstrap.bin`, the `0x5FC41000..0x5FF00000` pre-Linux relocation
+ownership, the post-downgrade live target state, and the watch bootloader's
+temporary-boot acceptance policy. Therefore the candidate artifact is a
+build result, not a claim that real hardware will enter UEFI.
