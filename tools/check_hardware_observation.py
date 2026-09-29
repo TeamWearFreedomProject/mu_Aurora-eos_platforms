@@ -14,6 +14,12 @@ def check(d):
     assert h["windows_usb"]["vid"]=="0x045e"
     assert h["windows_usb"]["pid"]=="0x066b"
     assert h["windows_usb"]["driver"]=="winusb.inf"
+    assert h["windows_usb"]["service"]=="WINUSB"
+    assert h["windows_usb"]["matching_device_id"]=="USB\\MS_COMP_WINUSB"
+    assert h["windows_usb"]["problem_code"]==0
+    assert h["windows_usb"]["is_present"] is True
+    assert h["windows_usb"]["has_problem"] is False
+    assert "USB\\COMPAT_VID_045E&Class_FF&SubClass_FF&Prot_FF" in h["windows_usb"]["compatible_ids"]
     assert h["windows_usb"]["instance_specific_serial_redacted"] is True
     c=d["source_correlation"]
     assert c["in_tree_fastboot_descriptor"]["pid"]=="0x0c2f"

@@ -564,3 +564,21 @@ handoff is expected** because the USB transport identity changed away from
 fastboot. The next debugging target is the visible UEFI/console path and
 where execution stalls after UFP enumeration, not the Android fastboot
 transport itself.
+
+### Windows PnP follow-up for the 045E:066B handoff
+
+A second read-only Windows PnP capture confirms that the post-handoff device
+is healthy at the USB/PnP layer:
+
+- hardware ID: `USB\VID_045E&PID_066B` (REV 0100);
+- service/driver: Microsoft `WINUSB` / `winusb.inf`;
+- matching ID: `USB\MS_COMP_WINUSB`;
+- compatible interface class: vendor-specific `FF/FF/FF`;
+- PnP problem code: **0**, device present, no problem reported.
+
+The instance-specific serial and malformed bus-reported string are intentionally
+not stored. This strengthens the conclusion that the watch reached a deliberate
+WinUSB/UFP-style USB function after leaving Android fastboot. It still does
+not identify where execution stops after UFP enumeration, so the next work
+remains read-only console/frontpage/runtime-path diagnosis rather than sending
+UFP commands or making persistent changes.

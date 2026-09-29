@@ -21,7 +21,24 @@
       "pnp_class": "USBDevice",
       "driver": "winusb.inf",
       "driver_provider": "Microsoft",
-      "instance_specific_serial_redacted": true
+      "instance_specific_serial_redacted": true,
+      "hardware_ids": [
+        "USB\\VID_045E&PID_066B&REV_0100",
+        "USB\\VID_045E&PID_066B"
+      ],
+      "compatible_ids": [
+        "USB\\MS_COMP_WINUSB",
+        "USB\\COMPAT_VID_045E&Class_FF&SubClass_FF&Prot_FF",
+        "USB\\Class_FF&SubClass_FF&Prot_FF"
+      ],
+      "service": "WINUSB",
+      "driver_description": "WinUsb Device",
+      "matching_device_id": "USB\\MS_COMP_WINUSB",
+      "problem_code": 0,
+      "is_present": true,
+      "has_problem": false,
+      "safe_removal_required": true,
+      "bus_reported_device_desc_redacted_mojibake": true
     }
   },
   "source_correlation": {
