@@ -582,3 +582,22 @@ WinUSB/UFP-style USB function after leaving Android fastboot. It still does
 not identify where execution stops after UFP enumeration, so the next work
 remains read-only console/frontpage/runtime-path diagnosis rather than sending
 UFP commands or making persistent changes.
+
+## Real-hardware follow-up: both fastboot candidate variants reach UFP-like USB
+
+The owner tested both generated CP2A candidate variants using temporary
+fastboot handoff. The non-secureboot and secureboot variants were each
+accepted by the existing fastboot transport and, after handoff, both appeared
+to Windows as **VID 045E / PID 066B** with the Microsoft WinUSB driver.
+
+That VID/PID is not the repository fastboot descriptor (which uses PID
+`0x0C2F`). It matches the bundled UFP application and the
+WOA-Project/WOA-Device-Manager example for
+`UnifiedFlashingPlatformTransport`. This is therefore strong evidence that
+both candidates execute far enough to enter the UEFI/UFP path.
+
+The identical UFP-like result for both variants means the current visible
+stall is **not distinguished by the candidate's secure-boot toggle**. The
+remaining investigation should focus on what happens after UFP/UEFI handoff
+(display/frontpage/console and later boot stages), while keeping relocation
+safety and persistent flashing unapproved.

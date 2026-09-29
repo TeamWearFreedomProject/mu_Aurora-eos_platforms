@@ -6,7 +6,21 @@
     "source_commit": "239711b777f94da4713395c6c90c52c02dfce11c",
     "workflow_run": 36515912839,
     "filename": "aurora_cp2a_nosb_fastboot_candidate_UNVERIFIED.img",
-    "persistent_flash_performed": false
+    "persistent_flash_performed": false,
+    "verified_variants": [
+      {
+        "filename": "aurora_cp2a_nosb_fastboot_candidate_UNVERIFIED.img",
+        "fastboot_send_result": "OKAY",
+        "fastboot_boot_result": "OKAY",
+        "post_handoff_usb": "045E:066B WinUSB / UFP-like"
+      },
+      {
+        "filename": "aurora_cp2a_secureboot_fastboot_candidate_UNVERIFIED.img",
+        "fastboot_send_result": "OKAY",
+        "fastboot_boot_result": "OKAY",
+        "post_handoff_usb": "045E:066B WinUSB / UFP-like"
+      }
+    ]
   },
   "host_observation": {
     "fastboot_send_result": "OKAY",
@@ -76,7 +90,9 @@
     "relocation_runtime_progress_observed": true,
     "relocation_memory_safety_proven": false,
     "bootstrap_full_compatibility_proven": false,
-    "hardware_boot_approved": false
+    "hardware_boot_approved": false,
+    "both_candidate_variants_reach_same_ufp_like_usb_stage": true,
+    "secureboot_toggle_not_the_current_visible_stall_discriminator": true
   },
-  "note": "This observation is a real hardware progress milestone, not proof that the image is safe, stable, or suitable for persistent flashing. Device serials are intentionally not recorded."
+  "note": "Both non-secureboot and secureboot fastboot candidate variants were accepted by fastboot and then enumerated as the same Microsoft WinUSB 045E:066B UFP-like device. This narrows the visible stall to after UEFI/UFP handoff, but does not establish stable/safe boot. Device serials are intentionally not recorded."
 }

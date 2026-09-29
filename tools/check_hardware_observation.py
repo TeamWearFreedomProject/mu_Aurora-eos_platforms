@@ -8,6 +8,16 @@ P=ROOT/"Platforms/AuroraPkg/Research/hardware_observation_2026-09-29_ufp.json"
 def check(d):
     assert d["candidate"]["source_commit"]=="239711b777f94da4713395c6c90c52c02dfce11c"
     assert d["candidate"]["persistent_flash_performed"] is False
+    variants=d["candidate"]["verified_variants"]
+    assert len(variants)==2
+    assert {v["filename"] for v in variants}=={
+        "aurora_cp2a_nosb_fastboot_candidate_UNVERIFIED.img",
+        "aurora_cp2a_secureboot_fastboot_candidate_UNVERIFIED.img",
+    }
+    for v in variants:
+        assert v["fastboot_send_result"]=="OKAY"
+        assert v["fastboot_boot_result"]=="OKAY"
+        assert v["post_handoff_usb"]=="045E:066B WinUSB / UFP-like"
     h=d["host_observation"]
     assert h["fastboot_send_result"]=="OKAY"
     assert h["fastboot_boot_result"]=="OKAY"
@@ -28,6 +38,8 @@ def check(d):
     assert i["device_left_fastboot_transport"] is True
     assert i["ufp_like_usb_enumeration_observed"] is True
     assert i["strong_evidence_candidate_reached_uefi_ufp_stage"] is True
+    assert i["both_candidate_variants_reach_same_ufp_like_usb_stage"] is True
+    assert i["secureboot_toggle_not_the_current_visible_stall_discriminator"] is True
     assert i["full_uefi_console_or_frontpage_observed"] is False
     assert i["relocation_memory_safety_proven"] is False
     assert i["hardware_boot_approved"] is False
