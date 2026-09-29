@@ -14,14 +14,18 @@ FADT=ROOT/"Platforms/AuroraPkg/Research/cp2a_fadt_audit.json"
 INF=ROOT/"Platforms/AuroraPkg/AcpiTables/AcpiTables.inf"
 
 def check(d):
-    assert d["readiness"]=="NOT_READY_FOR_HARDWARE_TEST"
+    assert d["readiness"]=="HARDWARE_PROGRESS_OBSERVED_NOT_STABLE_BOOT"
     assert d["hardware_boot_approved"] is False
     ids={x["id"] for x in d["unresolved_blockers"]}
-    assert ids=={"BOOTSHIM_RELOCATION","BOOTSTRAP_COMPATIBILITY","LIVE_TARGET_IDENTITY","BOOTLOADER_ACCEPTANCE","RECOVERY_PATH"}
+    assert ids=={"BOOTSHIM_RELOCATION","BOOTSTRAP_COMPATIBILITY","LIVE_TARGET_IDENTITY","UEFI_RUNTIME_STALL","RECOVERY_PATH"}
     assert d["offline_checks"]["inherited_seluna_acpi_active_count"]==0
     assert d["offline_checks"]["unevidenced_msi_frame_active"] is False
     assert d["offline_checks"]["unevidenced_fadt_reset_register_active"] is False
     assert d["offline_checks"]["cp2a_pptt_topology"]=="PASS_CONSERVATIVE_DT_EVIDENCE_ONLY"
+    assert d["latest_evidence"]["hardware_fastboot_candidate_test"] is True
+    assert d["latest_evidence"]["ufp_usb_enumeration_045e_066b"] is True
+    assert d["offline_checks"]["hardware_fastboot_transport_acceptance"]=="OBSERVED_OK_ON_2026-09-29_TEST"
+    assert d["offline_checks"]["post_handoff_usb_mode"]=="UFP_LIKE_045E_066B"
 
     rel=json.loads(REL.read_text())
     assert rel["interpretation"]["relocation_verified"] is False
@@ -42,4 +46,4 @@ def check(d):
 
 if __name__=="__main__":
     check(json.loads(P.read_text()))
-    print("NOT READY: offline checks are consistent, but relocation/bootstrap/live-target/bootloader-policy/recovery blockers remain")
+    print("HARDWARE PROGRESS: candidate left fastboot and reached UFP-like USB; console/stability/relocation-safety/recovery remain unresolved")

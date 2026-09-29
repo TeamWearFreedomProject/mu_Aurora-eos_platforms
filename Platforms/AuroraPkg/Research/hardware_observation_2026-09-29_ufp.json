@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-29",
+  "target": "Pixel Watch 2 Wi-Fi / aurora / CP2A.260603.001.S1",
+  "candidate": {
+    "source_commit": "239711b777f94da4713395c6c90c52c02dfce11c",
+    "workflow_run": 36515912839,
+    "filename": "aurora_cp2a_nosb_fastboot_candidate_UNVERIFIED.img",
+    "persistent_flash_performed": false
+  },
+  "host_observation": {
+    "fastboot_send_result": "OKAY",
+    "fastboot_boot_result": "OKAY",
+    "fastboot_command_finished": true,
+    "watch_display": "Logo appeared; no further visible progress was reported.",
+    "fastboot_devices_after_handoff": "no entries",
+    "windows_usb": {
+      "vid": "0x045e",
+      "pid": "0x066b",
+      "pnp_status": "OK",
+      "pnp_class": "USBDevice",
+      "driver": "winusb.inf",
+      "driver_provider": "Microsoft",
+      "instance_specific_serial_redacted": true
+    }
+  },
+  "source_correlation": {
+    "woa_device_manager": {
+      "repository": "WOA-Project/WOA-Device-Manager",
+      "commit": "aa1c5d0faeaed3928983d21c610615fe0f0b79a4",
+      "path": "Playground/Program.cs",
+      "finding": "Example opens USB VID_045E&PID_066B using UnifiedFlashingPlatformTransport."
+    },
+    "in_tree_ufp_binary": {
+      "path": "Platforms/SelunaPkg/UFP/ufpdevicefw.efi",
+      "size_bytes": 443904,
+      "little_endian_vid_pid_occurrences": 2,
+      "embedded_ascii_or_utf16_strings": [
+        "UFP",
+        "Microsoft",
+        "Flashing"
+      ],
+      "finding": "The bundled UFP application contains the exact 045E:066B descriptor pair."
+    },
+    "in_tree_fastboot_descriptor": {
+      "path": "Platforms/QcomModulePkg/Library/FastbootLib/UsbDescriptors.c",
+      "vid": "0x045e",
+      "pid": "0x0c2f",
+      "finding": "Repository fastboot interface uses PID 0x0C2F, not 0x066B."
+    }
+  },
+  "interpretation": {
+    "fastboot_transport_accepted_candidate": true,
+    "device_left_fastboot_transport": true,
+    "ufp_like_usb_enumeration_observed": true,
+    "strong_evidence_candidate_reached_uefi_ufp_stage": true,
+    "full_uefi_console_or_frontpage_observed": false,
+    "windows_os_booted": false,
+    "relocation_runtime_progress_observed": true,
+    "relocation_memory_safety_proven": false,
+    "bootstrap_full_compatibility_proven": false,
+    "hardware_boot_approved": false
+  },
+  "note": "This observation is a real hardware progress milestone, not proof that the image is safe, stable, or suitable for persistent flashing. Device serials are intentionally not recorded."
+}

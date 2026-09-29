@@ -528,3 +528,39 @@ but the current project still lacks authoritative evidence for the inherited
 ownership, the post-downgrade live target state, and the watch bootloader's
 temporary-boot acceptance policy. Therefore the candidate artifact is a
 build result, not a claim that real hardware will enter UEFI.
+
+## First real-hardware milestone: fastboot handoff to UFP-like USB
+
+A 2026-09-29 temporary-boot test of the **no-Secure-Boot CP2A candidate**
+(source commit `239711b777f94da4713395c6c90c52c02dfce11c`) produced a new,
+important observation:
+
+- host fastboot reported both **Sending OKAY** and **Booting OKAY**;
+- the watch showed a logo but no further visible UI;
+- the device then disappeared from the fastboot device list;
+- Windows enumerated a healthy WinUSB device at **VID 045E / PID 066B**.
+
+This is not the repository's fastboot USB identity: the in-tree fastboot
+descriptor uses **045E:0C2F**. By contrast, WOA-Device-Manager's UFP
+playground opens **045E:066B** with `UnifiedFlashingPlatformTransport`.
+The bundled `SelunaPkg/UFP/ufpdevicefw.efi` also contains the exact
+little-endian 045E:066B descriptor pair twice, plus UFP/Microsoft/Flashing
+strings.
+
+Therefore the best current interpretation is that the candidate **left
+fastboot and progressed into the UEFI/UFP path**. That is strong positive
+runtime evidence for the BootShim/FD path, but it is not proof of complete
+memory safety, stable UEFI execution, a working console/frontpage, or a
+Windows boot.
+
+The redacted machine-readable observation is in
+`Research/hardware_observation_2026-09-29_ufp.json`. Device serial numbers
+are intentionally not committed. A read-only Windows collector,
+`tools/collect_ufp_usb_readonly.ps1`, records PnP metadata without sending
+commands to the device.
+
+At this milestone, `fastboot devices` returning no entry **after the
+handoff is expected** because the USB transport identity changed away from
+fastboot. The next debugging target is the visible UEFI/console path and
+where execution stalls after UFP enumeration, not the Android fastboot
+transport itself.

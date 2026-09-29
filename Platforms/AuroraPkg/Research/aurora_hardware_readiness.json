@@ -8,7 +8,9 @@
     "cp2a_init_boot": true,
     "cp2a_vendor_boot": true,
     "cp2a_vendor_kernel_boot": true,
-    "cp2a_base_dtb": true
+    "cp2a_base_dtb": true,
+    "hardware_fastboot_candidate_test": true,
+    "ufp_usb_enumeration_045e_066b": true
   },
   "offline_checks": {
     "build_and_packaging": "PASS",
@@ -19,28 +21,30 @@
     "inherited_seluna_acpi_active_count": 0,
     "unevidenced_msi_frame_active": false,
     "unevidenced_fadt_reset_register_active": false,
-    "cp2a_pptt_topology": "PASS_CONSERVATIVE_DT_EVIDENCE_ONLY"
+    "cp2a_pptt_topology": "PASS_CONSERVATIVE_DT_EVIDENCE_ONLY",
+    "hardware_fastboot_transport_acceptance": "OBSERVED_OK_ON_2026-09-29_TEST",
+    "post_handoff_usb_mode": "UFP_LIKE_045E_066B"
   },
   "unresolved_blockers": [
     {
       "id": "BOOTSHIM_RELOCATION",
-      "detail": "0x5FC41000..0x5FF00000 is inherited from Seluna/Luna. No fixed DT overlap is observed, but pre-Linux bootloader/TrustZone ownership is not proven."
+      "detail": "A real temporary-boot run progressed far enough to leave fastboot and enumerate an in-tree UFP-like USB identity, so the inherited relocation works at least far enough for substantial UEFI execution. Full pre-Linux ownership/safety is still not proven."
     },
     {
       "id": "BOOTSTRAP_COMPATIBILITY",
-      "detail": "ImageResources/bootstrap.bin is exactly the upstream Seluna asset and is not the uploaded CP2A stock kernel; Aurora compatibility is unverified."
+      "detail": "The inherited bootstrap participated in a run that reached UFP-like USB enumeration, which is positive runtime evidence, but exact CP2A compatibility and latent corruption risks remain unproven."
     },
     {
       "id": "LIVE_TARGET_IDENTITY",
       "detail": "No fresh live CP2A fingerprint/slot observation is available after downgrade because normal setup/ADB is unavailable."
     },
     {
-      "id": "BOOTLOADER_ACCEPTANCE",
-      "detail": "Experimental image is not stock-AVB authenticated; actual temporary-boot acceptance/policy has not been established offline."
-    },
-    {
       "id": "RECOVERY_PATH",
       "detail": "A current, verified recovery/backup path has not been recorded in project evidence."
+    },
+    {
+      "id": "UEFI_RUNTIME_STALL",
+      "detail": "Real hardware left fastboot and enumerated as WinUSB 045E:066B, strongly matching the bundled UFP application, but only a logo was visible and no normal UEFI console/frontpage was observed."
     }
   ],
   "not_required_for_first_uefi_entry_but_incomplete": [
@@ -50,5 +54,5 @@
     "PPTT cache geometry fields absent from DT (line size/sets/associativity)"
   ],
   "hardware_boot_approved": false,
-  "readiness": "NOT_READY_FOR_HARDWARE_TEST"
+  "readiness": "HARDWARE_PROGRESS_OBSERVED_NOT_STABLE_BOOT"
 }
