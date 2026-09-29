@@ -73,8 +73,8 @@
       "0x00001000"
     ],
     "aurora_pcd_clock_hz": 19200000,
-    "aurora_current_secure_interrupt": 29,
-    "aurora_current_nonsecure_interrupt": 30,
+    "aurora_current_secure_interrupt": 17,
+    "aurora_current_nonsecure_interrupt": 18,
     "inherited_acpi_gtdt_interrupts": {
       "secure_el1": 29,
       "nonsecure_el1": 30,
@@ -82,7 +82,9 @@
       "nonsecure_el2": 26
     },
     "cp2a_dtb_interrupt_encoding_matches_inherited_gtdt": false,
-    "action": "Do not auto-change timer interrupt PCD/GTDT until the Monaco PPI-to-ACPI GSIV interpretation is reviewed."
+    "action": "Diagnostic UEFI TimerDxe PCDs now match CP2A DTB PPI-to-GSIV interpretation and local GTDT; live behavior remains unverified.",
+    "aurora_current_virtual_interrupt": 19,
+    "aurora_current_hyp_interrupt": 16
   },
   "uart": {
     "alias": "serial0",

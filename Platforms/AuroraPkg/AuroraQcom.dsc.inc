@@ -14,8 +14,12 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000         # Starting address
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x5FF8C000
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|19200000
-  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29
-  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30
+  # CP2A arm,armv8-timer PPIs 1/2/3/0 map to GIC INTIDs 17/18/19/16.
+  # Diagnostic correction only; matching the DTB does not prove stable boot.
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|17
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|18
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|19
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|16
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x0f200000
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0f300000
 

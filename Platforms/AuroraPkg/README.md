@@ -601,3 +601,22 @@ stall is **not distinguished by the candidate's secure-boot toggle**. The
 remaining investigation should focus on what happens after UFP/UEFI handoff
 (display/frontpage/console and later boot stages), while keeping relocation
 safety and persistent flashing unapproved.
+
+## CP2A timer diagnostic candidate
+
+The initial CP2A temporary-boot candidates displayed a logo briefly, then a
+black screen, while Windows enumerated a WinUSB/UFP-like `045E:066B` device.
+That observation cannot tell whether the console, boot manager, or display
+stopped. The CP2A base DTB's `arm,armv8-timer` PPIs 1/2/3/0 map to GIC
+INTIDs 17/18/19/16, and the local GTDT already uses those values. The
+Aurora UEFI TimerDxe PCDs previously inherited 29/30/27/26 from Seluna.
+
+This diagnostic revision changes **only** the four UEFI timer-interrupt PCDs
+(secure 17, nonsecure 18, virtual 19, hyp 16). It does not change framebuffer,
+button, UFP, BootShim, or boot-image packaging code. The CP2A SoC checker
+requires all four PCDs to match the CP2A-derived GTDT. A successful build
+checks consistency, not real timer delivery or hardware safety. Compare any
+future observation against the earlier candidate from commit
+`239711b777f94da4713395c6c90c52c02dfce11c`; do not flash to a persistent
+partition. A black screen with the same USB identity would leave display/BDS
+and inherited device drivers unresolved.

@@ -38,6 +38,19 @@ def check(d):
     assert pcd(dsc,"gArmTokenSpaceGuid.PcdGicDistributorBase")==0x0f200000
     assert pcd(dsc,"gArmTokenSpaceGuid.PcdGicRedistributorsBase")==0x0f300000
     assert pcd(dsc,"gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz")==19200000
+    # Keep UEFI TimerDxe PCDs aligned with the CP2A-derived local GTDT.
+    assert [x[1] for x in d["timer"]["dtb_arch_timer_interrupts_raw"]]==[1,2,3,0]
+    timer=d["aurora_acpi_port"]["architected_timer_gsivs"]
+    for name,key in (("PcdArmArchTimerSecIntrNum","secure_el1"),
+                     ("PcdArmArchTimerIntrNum","nonsecure_el1"),
+                     ("PcdArmArchTimerVirtIntrNum","virtual"),
+                     ("PcdArmArchTimerHypIntrNum","nonsecure_el2")):
+        assert pcd(dsc,"gArmTokenSpaceGuid."+name)==timer[key], f"{name} differs from CP2A GTDT"
+    for key,field in (("secure_el1","aurora_current_secure_interrupt"),
+                      ("nonsecure_el1","aurora_current_nonsecure_interrupt"),
+                      ("virtual","aurora_current_virtual_interrupt"),
+                      ("nonsecure_el2","aurora_current_hyp_interrupt")):
+        assert d["timer"][field]==timer[key], f"{field} differs from CP2A GTDT"
     assert pcd(dsc,"gSelunaPkgTokenSpaceGuid.PcdUartSerialBase")==0x04a98000
     assert pcd(dsc,"gArmPlatformTokenSpaceGuid.PcdCoreCount")==4
     assert pcd(dsc,"gArmPlatformTokenSpaceGuid.PcdClusterCount")==1
@@ -85,4 +98,4 @@ def check(d):
 
 if __name__=="__main__":
     check(json.loads(DATA.read_text()))
-    print("PASS: CP2A GIC/UART/MMIO coverage verified; CPU count corrected; inherited ACPI IRQ/MPIDR mismatches remain BLOCKERS")
+    print("PASS: CP2A GIC/UART/MMIO and four UEFI timer PCDs match local GTDT; hardware behavior remains unverified")
