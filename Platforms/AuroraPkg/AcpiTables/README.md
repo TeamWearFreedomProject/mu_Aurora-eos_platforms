@@ -138,3 +138,19 @@ mappings are still missing.
 So "Seluna ACPI separation" is now much cleaner: **zero SelunaACPI binary
 tables are active**, while peripheral ACPI remains intentionally incomplete.
 This is a research/build milestone only; hardware boot approval remains false.
+
+## FADT follow-up: PSCI confirmed, reset register still unknown
+
+The CP2A base DTB contains `/soc/psci` with
+`compatible = "arm,psci-1.0"` and `method = "smc"`. That is direct
+evidence for keeping the FADT's ARM PSCI-compliant flag.
+
+The inherited reset GAS at `0x009020B4` is a different story: no exact
+matching register address appears in the supplied CP2A base DTB, and we do
+not yet have an authoritative CP2A reset-control description for that value.
+It remains explicitly **UNVERIFIED** rather than being accepted merely
+because the build works.
+
+So the FADT is now split into an evidenced part (PSCI) and an inherited part
+(reset semantics). This narrows the remaining FADT blocker without inventing
+a replacement reset register.

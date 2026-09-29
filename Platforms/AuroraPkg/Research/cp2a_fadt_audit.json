@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "target": "Pixel Watch 2 Wi-Fi / aurora / CP2A.260603.001.S1",
+  "source_vendor_kernel_boot_sha256": "ea6d8e296cdd66fbb356f1b1563f1ed393b089b3c08e0e5215bcc74a88e47d98",
+  "cp2a_psci": {
+    "path": "/soc/psci",
+    "compatible": "arm,psci-1.0",
+    "method": "smc",
+    "fadt_arm_boot_arch_psci_compliant_supported": true
+  },
+  "current_fadt": {
+    "hardware_reduced_acpi": true,
+    "low_power_s0_idle_capable": true,
+    "arm_psci_compliant_flag": true,
+    "reset_register_address": "0x009020b4",
+    "reset_value": 1
+  },
+  "reset_validation": {
+    "exact_reset_register_found_in_cp2a_base_dtb": false,
+    "authoritative_cp2a_reset_semantics_obtained": false,
+    "status": "UNVERIFIED_INHERITED_VALUE"
+  },
+  "implications": {
+    "psci_flag_verified": true,
+    "reset_register_verified": false,
+    "fadt_fully_verified": false,
+    "hardware_boot_approved": false
+  }
+}

@@ -1,4 +1,4 @@
-/* Aurora temporary FADT: reset register and flags copied from Selene; validate. */
+/* Aurora FADT scaffold: CP2A DT verifies PSCI 1.0 via SMC; ResetReg remains unverified. */
 /** @file
 *  Fixed ACPI Description Table (FADT)
 *
