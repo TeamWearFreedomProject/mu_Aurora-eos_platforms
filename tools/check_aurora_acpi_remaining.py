@@ -10,10 +10,10 @@ DSDT=ROOT/"Platforms/AuroraPkg/AcpiTables/DSDT.asl"
 
 def check(d):
     s=d["selected_tables"]
-    assert s["local_cp2a_derived"]==["APIC/MADT","GTDT","DSDT"]
+    assert s["local_cp2a_derived"]==["APIC/MADT","GTDT","PPTT","DSDT"]
     assert s["active_inherited"]==[]
     assert set(s["quarantined_inherited"])=={
-        "CSRT","DBG2","IORT","MCFG","PPTT","SSDT","TPMDev","SoftwareTpm2Table"
+        "CSRT","DBG2","IORT","MCFG","SSDT","TPMDev","SoftwareTpm2Table"
     }
 
     sep=d["separation_status"]
@@ -22,16 +22,19 @@ def check(d):
     assert sep["active_seluna_acpi_binary_count"]==0
     assert sep["inherited_tables_quarantined"] is True
     assert sep["platform_peripheral_acpi_localized"] is False
+    assert sep["pptt_cache_topology_localized"] is True
     assert sep["next_priority"]=="IORT_RECONSTRUCTION"
     assert d["hardware_boot_approved"] is False
 
     text=INF.read_text()
-    assert "Generated/APIC.aml" in text and "Generated/GTDT.aml" in text
+    assert "Generated/APIC.aml" in text and "Generated/GTDT.aml" in text and "Generated/PPTT.aml" in text
     assert "DSDT.asl" in text
     assert "SelunaACPI/" not in text
-    for bad in ("CSRT.aml","DBG2.aml","IORT.aml","MCFG.aml","PPTT.aml",
+    for bad in ("CSRT.aml","DBG2.aml","IORT.aml","MCFG.aml",
                 "SSDT.aml","TPMDev.dat","SoftwareTpm2Table.aml"):
-        assert bad not in text
+        if bad == "PPTT.aml":
+            continue
+        assert ("SelunaACPI/" + bad) not in text
 
     dsdt=DSDT.read_text()
     assert len(re.findall(r"Device \(CPU[0-3]\)",dsdt))==4
@@ -41,4 +44,4 @@ def check(d):
 
 if __name__=="__main__":
     check(json.loads(P.read_text()))
-    print("PASS: active ACPI is local minimal core only; all inherited Seluna ACPI binaries quarantined; hardware boot NOT approved")
+    print("PASS: active ACPI core includes local CP2A PPTT; inherited Seluna peripheral tables remain quarantined; hardware boot NOT approved")

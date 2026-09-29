@@ -4,14 +4,12 @@ Aurora.dsc and Aurora.fdf now select this local ACPI INF and a local
 Selene-derived FADT and Qualcomm header. No active Pixel Watch 2
 ACPI device definitions are implemented yet.
 
-APIC/MADT and GTDT are now generated locally from CP2A evidence. The remaining
-compiled AML/binary inputs still include upstream SelunaACPI/5100/builtin and
-SelunaACPI/common tables written for the inherited SW5100 platform. These
-must be compared with **the exact Aurora Wi-Fi device tree and current
-firmware**, including GPIO/button IRQs, display/IOMMU, WLAN, storage,
-power, and I2C bus topology. Existing FADT ResetReg/PSCI fields and
-all AML are unverified; no Windows boot testing is authorized by
-a successful build.
+APIC/MADT, GTDT and PPTT are now generated locally from CP2A evidence, and
+the DSDT is Aurora-local and CPU-only. **No SelunaACPI binary table is active.**
+Peripheral ACPI remains intentionally incomplete: IORT, DBG2, CSRT, MCFG and
+common SSDTs stay quarantined until exact Aurora namespace/driver evidence
+exists. The FADT keeps verified PSCI support but exposes no unevidenced reset
+register. Successful compilation still does not authorize hardware testing.
 
 ## CP2A DTBO evidence relevant to later ACPI/GPIO work
 
@@ -154,3 +152,28 @@ because the build works.
 So the FADT is now split into an evidenced part (PSCI) and an inherited part
 (reset semantics). This narrows the remaining FADT blocker without inventing
 a replacement reset register.
+
+## ACPI batch cleanup: local PPTT + CI/readiness consolidation
+
+The CP2A base DTB contains enough cache-topology evidence to replace the
+known-wrong inherited PPTT without inventing missing geometry:
+
+- four CPUs / UIDs 0..3,
+- **distinct 32 KiB L1 instruction and 32 KiB L1 data cache nodes per CPU**,
+- one **shared 512 KiB L2** referenced by all four CPUs.
+
+Aurora now generates a local PPTT with exactly that topology. The DTB does
+**not** publish cache line size, set count or associativity, so those PPTT
+fields are deliberately left invalid/zero instead of copying Seluna values.
+The old inherited PPTT is no longer selected.
+
+The active ACPI set is now FADT + local DSDT + generated MADT/GTDT/PPTT.
+IORT remains intentionally absent: the CP2A SMMU bases and stream IDs are
+known, but Windows-visible ACPI named-component mappings are not. Generating
+an IORT without those mappings would replace one known-wrong table with a
+different guess.
+
+CI now also runs the consolidated hardware-readiness gate on every relevant
+tool-only change. That gate remains **NOT_READY_FOR_HARDWARE_TEST** because
+BootShim relocation, bootstrap compatibility, live CP2A identity,
+bootloader acceptance and a verified recovery path are still unresolved.

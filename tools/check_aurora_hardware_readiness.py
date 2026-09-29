@@ -21,6 +21,7 @@ def check(d):
     assert d["offline_checks"]["inherited_seluna_acpi_active_count"]==0
     assert d["offline_checks"]["unevidenced_msi_frame_active"] is False
     assert d["offline_checks"]["unevidenced_fadt_reset_register_active"] is False
+    assert d["offline_checks"]["cp2a_pptt_topology"]=="PASS_CONSERVATIVE_DT_EVIDENCE_ONLY"
 
     rel=json.loads(REL.read_text())
     assert rel["interpretation"]["relocation_verified"] is False

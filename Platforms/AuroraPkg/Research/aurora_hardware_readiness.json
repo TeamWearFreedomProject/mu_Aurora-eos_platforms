@@ -18,7 +18,8 @@
     "minimal_cp2a_acpi_core": "PASS",
     "inherited_seluna_acpi_active_count": 0,
     "unevidenced_msi_frame_active": false,
-    "unevidenced_fadt_reset_register_active": false
+    "unevidenced_fadt_reset_register_active": false,
+    "cp2a_pptt_topology": "PASS_CONSERVATIVE_DT_EVIDENCE_ONLY"
   },
   "unresolved_blockers": [
     {
@@ -44,9 +45,9 @@
   ],
   "not_required_for_first_uefi_entry_but_incomplete": [
     "IORT/peripheral DMA mappings",
-    "PPTT cache topology",
     "peripheral DSDT devices",
-    "Windows hardware IDs and drivers"
+    "Windows hardware IDs and drivers",
+    "PPTT cache geometry fields absent from DT (line size/sets/associativity)"
   ],
   "hardware_boot_approved": false,
   "readiness": "NOT_READY_FOR_HARDWARE_TEST"

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "target": "Pixel Watch 2 Wi-Fi / aurora / CP2A.260603.001.S1",
+  "source_vendor_kernel_boot_sha256": "ea6d8e296cdd66fbb356f1b1563f1ed393b089b3c08e0e5215bcc74a88e47d98",
+  "selected_base_dtb": "qcom,monacop / MSM ID 0x205",
+  "cpu": {
+    "count": 4,
+    "uids": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "mpidr": [
+      "0x0",
+      "0x1",
+      "0x2",
+      "0x3"
+    ],
+    "each_i_cache_size_bytes": 32768,
+    "each_d_cache_size_bytes": 32768,
+    "capacity_dmips_mhz_each": 1024
+  },
+  "cache_topology": {
+    "distinct_l1_instruction_nodes": 4,
+    "distinct_l1_data_nodes": 4,
+    "shared_l2_nodes": 1,
+    "shared_l2_size_bytes": 524288,
+    "all_cpus_next_level_cache_same_phandle": "0x5"
+  },
+  "properties_not_present_in_cp2a_dtb": [
+    "cache-line-size",
+    "cache-sets",
+    "cache-associativity"
+  ],
+  "generated_pptt": {
+    "revision": 1,
+    "length_bytes": 384,
+    "cache_size_valid": true,
+    "cache_type_valid": true,
+    "line_size_valid": false,
+    "number_of_sets_valid": false,
+    "associativity_valid": false,
+    "per_cpu_private_resources": [
+      "L1 instruction",
+      "L1 data"
+    ],
+    "l1_next_level": "shared L2",
+    "processor_nodes_are_leaf": true
+  },
+  "inherited_seluna_pptt_selected": false,
+  "hardware_boot_approved": false
+}

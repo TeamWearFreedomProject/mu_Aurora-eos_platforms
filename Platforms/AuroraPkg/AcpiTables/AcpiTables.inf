@@ -23,6 +23,7 @@
 [Binaries.AARCH64]
    ASL|AuroraPkg/AcpiTables/Generated/APIC.aml
    ASL|AuroraPkg/AcpiTables/Generated/GTDT.aml
+   ASL|AuroraPkg/AcpiTables/Generated/PPTT.aml
 
 [Packages]
   ArmPkg/ArmPkg.dec

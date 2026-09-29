@@ -6,6 +6,7 @@
     "local_cp2a_derived": [
       "APIC/MADT",
       "GTDT",
+      "PPTT",
       "DSDT"
     ],
     "local_platform_scaffold": [
@@ -17,7 +18,6 @@
       "DBG2",
       "IORT",
       "MCFG",
-      "PPTT",
       "SSDT",
       "TPMDev",
       "SoftwareTpm2Table"
@@ -44,7 +44,7 @@
       "selected_in_active_acpi": false
     },
     "PPTT": {
-      "verdict": "CACHE_TOPOLOGY_MISMATCH_BLOCKER",
+      "verdict": "REPLACED_BY_CP2A_LOCAL_CONSERVATIVE_PPTT",
       "inherited_cpu_ids": [
         0,
         1,
@@ -66,8 +66,10 @@
         399,
         400
       ],
-      "hardware_blocker": true,
-      "selected_in_active_acpi": false
+      "hardware_blocker": false,
+      "selected_in_active_acpi": false,
+      "replacement_selected": true,
+      "replacement_detail": "Aurora-local PPTT: four processor UIDs, distinct 32KiB L1I/L1D nodes per CPU, one shared 512KiB L2. Line size/sets/associativity are omitted because CP2A DT does not publish them."
     },
     "IORT": {
       "verdict": "SMMU_BASE_MISMATCH_MAJOR_BLOCKER",
@@ -134,15 +136,15 @@
     "active_seluna_acpi_binary_count": 0,
     "inherited_tables_quarantined": true,
     "platform_peripheral_acpi_localized": false,
-    "quarantined_table_count": 8,
+    "quarantined_table_count": 7,
     "major_remaining_blockers": [
       "IORT_RECONSTRUCTION",
-      "PPTT_RECONSTRUCTION",
       "PERIPHERAL_DSDT",
       "FADT_RESET_VALIDATION"
     ],
     "next_priority": "IORT_RECONSTRUCTION",
-    "reason": "The wrong Seluna IORT is no longer active. CP2A supplies real SMMU bases and DT iommus stream IDs, but Windows/ACPI named-component mappings are still missing."
+    "reason": "The wrong Seluna IORT is no longer active. CP2A supplies real SMMU bases and DT iommus stream IDs, but Windows/ACPI named-component mappings are still missing.",
+    "pptt_cache_topology_localized": true
   },
   "hardware_boot_approved": false
 }
