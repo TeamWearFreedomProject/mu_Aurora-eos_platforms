@@ -88,5 +88,9 @@
 !include SelunaPkg/Seluna.dsc.inc
 !include SelunaPkg/Frontpage.dsc.inc
 
+# Diagnostic only: attempt FrontPage directly and hold if it returns.
+[LibraryClasses.common]
+  DeviceBootManagerLib|AuroraPkg/Library/DeviceBootManagerLib/AuroraFrontPageDiagnostic.inf
+
 [Components.common]
   AuroraPkg/AcpiTables/AcpiTables.inf

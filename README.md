@@ -26,6 +26,10 @@ Pixel Watch 2 Wi-Fi（コードネーム **aurora**）向けの、実験中のUE
 - [詳しい技術メモ](Platforms/AuroraPkg/README.md)：CP2A画像の解析、メモリマップ、ACPI、未解決点。
 - [実機観測の記録](Platforms/AuroraPkg/Research/hardware_observation_2026-09-29_ufp.json)：一時起動とUSB認識。端末固有のシリアル番号は含みません。
 
+## 2026-09-30の診断更新
+
+タイマー診断版も一時起動に受理されましたが、画面は消え、USBは同じ `045E:066B` のWinUSBとして認識されました。現在のAuroraビルドには、UFPへの通常分岐を避けて設定画面（FrontPage）を直接試す診断用フックを入れています。[変更内容と観測の読み方](Platforms/AuroraPkg/Research/frontpage_routing_diagnostic_2026-09-30.md)を参照してください。新しい成果物名は `aurora-CP2A-frontpage-diagnostic-UNVERIFIED` です。この版の実機結果は未確認です。
+
 ## 次に調べること
 
 1. 実機の現在のファームウェア・スロット・復旧手段を再確認する。

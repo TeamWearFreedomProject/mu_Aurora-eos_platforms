@@ -94,5 +94,28 @@
     "both_candidate_variants_reach_same_ufp_like_usb_stage": true,
     "secureboot_toggle_not_the_current_visible_stall_discriminator": true
   },
-  "note": "Both non-secureboot and secureboot fastboot candidate variants were accepted by fastboot and then enumerated as the same Microsoft WinUSB 045E:066B UFP-like device. This narrows the visible stall to after UEFI/UFP handoff, but does not establish stable/safe boot. Device serials are intentionally not recorded."
+  "note": "Both non-secureboot and secureboot fastboot candidate variants were accepted by fastboot and then enumerated as the same Microsoft WinUSB 045E:066B UFP-like device. This narrows the visible stall to after UEFI/UFP handoff, but does not establish stable/safe boot. Device serials are intentionally not recorded.",
+  "follow_up_2026_09_30": {
+    "target_product": "aurora",
+    "current_slot": "b",
+    "live_firmware_fingerprint_verified": false,
+    "adb_available": false,
+    "bootloader_unlocked_reported": true,
+    "diagnostic_source_commit": "77a7011e098c7e1b56f79955a795987b678c726f",
+    "workflow_run": 36560298201,
+    "variant": "nosb",
+    "fastboot_send_result": "OKAY",
+    "fastboot_boot_result": "OKAY",
+    "watch_display": "Screen disappeared after a short interval; no visible improvement reported.",
+    "windows_usb": {
+      "vid": "0x045e",
+      "pid": "0x066b",
+      "driver": "winusb.inf",
+      "driver_provider": "Microsoft",
+      "matching_device_id": "USB\\MS_COMP_WINUSB",
+      "pnp_general_tab_reported_normal": true,
+      "instance_specific_serial_redacted": true
+    },
+    "interpretation": "Timer-PCD revision did not resolve the observed blank-screen/UFP-like USB symptom. Timer interrupt delivery is not proven. USB identity alone does not distinguish button-priority UFP from default-boot UFP."
+  }
 }
