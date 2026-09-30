@@ -117,5 +117,23 @@
       "instance_specific_serial_redacted": true
     },
     "interpretation": "Timer-PCD revision did not resolve the observed blank-screen/UFP-like USB symptom. Timer interrupt delivery is not proven. USB identity alone does not distinguish button-priority UFP from default-boot UFP."
+  },
+  "frontpage_diagnostic_2026_09_30": {
+    "source_commit": "3472bc8ae45224ac0e9e58a7f8762094a83136da",
+    "workflow_run": 36702325252,
+    "variant": "nosb",
+    "installation_method": "fastboot flash boot (accidental persistent write)",
+    "written_partition": "boot_b",
+    "fastboot_write_result": "OKAY",
+    "current_slot_after_write": "b",
+    "bootloader_fastboot_access_confirmed_after_write": true,
+    "stock_boot_restored_owner_report": true,
+    "stock_boot_restore_command_and_hash_not_collected": true,
+    "blue_marker_observed": true,
+    "red_marker_observation": "not reported",
+    "watch_display": "Blue appeared briefly then disappeared; an attached photo shows the inherited logo.",
+    "post_handoff_usb": "Owner reports USB disappeared and no device was recognized.",
+    "interpretation": "Execution reached the diagnostic priority hook and could draw the blue GOP marker. The previous UFP-like USB outcome did not recur. This does not prove FrontPage entry or identify where execution/display stopped; option preparation, image loading/constructors, FrontPage initialization/rendering, display lifetime and reset remain unresolved.",
+    "device_serials_redacted": true
   }
 }
