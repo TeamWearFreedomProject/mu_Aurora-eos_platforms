@@ -1,5 +1,5 @@
 /** @file
-  Aurora-only diagnostic: attempt FrontPage before button/default boot paths.
+  Aurora-only diagnostic: draw a blue GOP marker once and hold before boot selection.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -10,7 +10,6 @@
 #undef DeviceBootManagerPriorityBoot
 
 #include <Library/BaseLib.h>
-#include <Library/UefiBootManagerLib.h>
 #include <Protocol/GraphicsOutput.h>
 
 STATIC
@@ -47,7 +46,7 @@ AuroraDiagnosticMarker (
                   Width / 4, Height / 4,
                   Width - (Width / 4) * 2, Height - (Height / 4) * 2, 0
                   );
-  DEBUG ((DEBUG_INFO, "[Aurora FP diagnostic] marker: %r\n", Status));
+  DEBUG ((DEBUG_INFO, "[Aurora blue-hold diagnostic] marker: %r\n", Status));
 }
 
 EFI_STATUS
@@ -58,23 +57,17 @@ DeviceBootManagerPriorityBoot (
 {
   EFI_STATUS  Status;
 
-  // This is a diagnostic stop point, not a permanent boot policy.
-  // No button state, BootNext or default boot option can select UFP here.
-  // Blue marks entry; FrontPage may immediately replace/clear it.
+  (VOID)BootOption;
+
+  // Control experiment: do not prepare or start any boot application.
+  // Disable the UEFI watchdog before drawing; inherited hardware watchdogs,
+  // interrupts and previously scheduled events are not changed by this hook.
+  Status = gBS->SetWatchdogTimer (0, 0, 0, NULL);
+  DEBUG ((DEBUG_INFO, "[Aurora blue-hold diagnostic] disable watchdog: %r\n", Status));
+
+  // Draw once, then hold. Repainting would hide a display-lifetime problem.
+  // No console print/clear follows the marker.
   AuroraDiagnosticMarker (0, 80, 255);
-  DEBUG ((DEBUG_INFO, "[Aurora FP diagnostic] direct FrontPage attempt\n"));
-
-  Status = MsBootOptionsLibGetBootManagerMenu (BootOption, NULL);
-  if (!EFI_ERROR (Status)) {
-    EfiBootManagerBoot (BootOption);
-    Status = BootOption->Status;
-    EfiBootManagerFreeLoadOption (BootOption);
-  }
-
-  // A returning FrontPage must not fall through to FFU/UFP/default OS boot.
-  Print (L"Aurora FP returned: %r\r\n", Status);
-  DEBUG ((DEBUG_ERROR, "[Aurora FP diagnostic] FrontPage returned: %r\n", Status));
-  AuroraDiagnosticMarker (255, 0, 0);
   CpuDeadLoop ();
   return EFI_ABORTED;
 }

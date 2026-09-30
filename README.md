@@ -17,7 +17,7 @@ Pixel Watch 2 Wi-Fi（コードネーム **aurora**）向けの、実験中のUE
 | USB | 暗転後、Windowsで `045E:066B` のWinUSB/UFPらしい機器として認識 |
 | Mass Storage / Windows起動 | 未確認 |
 
-最新の**タイマー診断版**は、UEFI内部に残っていたWatch 3由来の割り込み番号をCP2AのDTBに合わせて修正したものです。[ビルド結果と成果物（Run 36560298201）](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/actions/runs/36560298201)は成功していますが、**診断版の実機動作は未確認**です。成功したビルドは実機での安全性や動作を保証しません。
+以前の**タイマー診断版**は、UEFI内部に残っていたWatch 3由来の割り込み番号をCP2AのDTBに合わせて修正したものです。[ビルド結果と成果物（Run 36560298201）](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/actions/runs/36560298201)は成功していますが、実機では暗転と同じWinUSB認識が続きました。成功したビルドは実機での安全性や動作を保証しません。
 
 ## リポジトリの見方
 
@@ -28,13 +28,15 @@ Pixel Watch 2 Wi-Fi（コードネーム **aurora**）向けの、実験中のUE
 
 ## 2026-09-30の診断更新
 
-タイマー診断版も一時起動に受理されましたが、画面は消え、USBは同じ `045E:066B` のWinUSBとして認識されました。現在のAuroraビルドには、UFPへの通常分岐を避けて設定画面（FrontPage）を直接試す診断用フックを入れています。[変更内容と観測の読み方](Platforms/AuroraPkg/Research/frontpage_routing_diagnostic_2026-09-30.md)を参照してください。新しい成果物名は `aurora-CP2A-frontpage-diagnostic-UNVERIFIED` です。この版の実機結果は未確認です。
+タイマー診断版でも暗転後に `045E:066B` のWinUSBが認識されました。次の設定画面直行版では青い目印が一瞬出た後に画面が消え、USBも認識されなくなったとの報告があります。設定画面直行版は誤って `boot_b` に永続書き込みされ、その後、所有者が純正bootを戻したと報告しています。
+
+現在の診断版は、設定画面を呼ばず青い目印を一度だけ描いて保持します。[狙いと観測の読み方](Platforms/AuroraPkg/Research/blue_display_hold_diagnostic_2026-09-30.md)を参照してください。成果物名は `aurora-CP2A-blue-hold-diagnostic-UNVERIFIED` です。この版の実機結果は未確認です。
 
 ## 次に調べること
 
 1. 実機の現在のファームウェア・スロット・復旧手段を再確認する。
-2. タイマー診断版と以前の候補で、ロゴ後の表示とUSB認識の違いを比較する。
-3. 変化がなければ、Watch 3由来の画面・ボタン・ブートメニュー処理を切り分ける。
+2. 青保持診断版を一時起動し、約60秒の表示とUSB認識を記録する。
+3. 青が残るなら設定画面の初期化経路、消えるなら設定画面より前から動く表示・イベント・リセット処理を切り分ける。
 
 ## Linuxカーネル起動までの目標
 
