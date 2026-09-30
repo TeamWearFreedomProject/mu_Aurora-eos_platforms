@@ -39,6 +39,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/HiiLib.h>
 #include <Library/PrintLib.h>
+#include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiLib.h>
@@ -1494,6 +1495,93 @@ ProcessBootNext (
   The function will present the main menu of the system setup,
   this is the platform reference part and can be customize.
 **/
+
+/**
+  Best-effort, font-independent stage marker for Aurora diagnostics.
+  Numbers use GOP rectangles, so HII fonts and the UI toolkit are not needed.
+**/
+STATIC
+VOID
+AuroraFrontPageStage (
+  IN UINTN Stage
+  )
+{
+  STATIC CONST UINT8 Digits[10][7] = {
+    {14,17,19,21,25,17,14}, {4,12,4,4,4,4,14},
+    {14,17,1,2,4,8,31}, {30,1,1,14,1,1,30},
+    {2,6,10,18,31,2,2}, {31,16,16,30,1,1,30},
+    {14,16,16,30,17,17,14}, {31,1,2,4,8,8,8},
+    {14,17,17,14,17,17,14}, {14,17,17,15,1,1,14}
+  };
+  STATIC CONST UINT8 Colors[10][3] = {
+    {255,255,255}, {255,255,0}, {0,255,0}, {0,255,255},
+    {255,0,255}, {255,128,0}, {160,96,255}, {0,160,128},
+    {128,192,255}, {255,0,0}
+  };
+  EFI_GRAPHICS_OUTPUT_PROTOCOL  *Gop;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Ink = {0,0,0,0};
+  EFI_STATUS                   Status;
+  UINTN                        Width;
+  UINTN                        Height;
+  UINTN                        Scale;
+  UINTN                        X;
+  UINTN                        Y;
+  UINTN                        Count;
+  UINTN                        Index;
+  UINTN                        Digit;
+  UINTN                        Row;
+  UINTN                        Col;
+
+  if (!FeaturePcdGet (PcdAuroraFrontPageStageDiagnostic)) {
+    return;
+  }
+
+  if ((Stage < 1) || (Stage > 10)) {
+    return;
+  }
+
+  DEBUG ((DEBUG_INFO, "[Aurora FrontPage stage] %u\n", Stage));
+  Status = gBS->LocateProtocol (&gEfiGraphicsOutputProtocolGuid, NULL, (VOID **)&Gop);
+  if (!EFI_ERROR (Status) && (Gop != NULL) && (Gop->Mode != NULL) && (Gop->Mode->Info != NULL)) {
+    Width  = Gop->Mode->Info->HorizontalResolution;
+    Height = Gop->Mode->Info->VerticalResolution;
+    Scale  = MIN (Width, Height) / 48;
+    if (Scale != 0) {
+      Background.Red      = Colors[Stage - 1][0];
+      Background.Green    = Colors[Stage - 1][1];
+      Background.Blue     = Colors[Stage - 1][2];
+      Background.Reserved = 0;
+      Status = Gop->Blt (
+                      Gop, &Background, EfiBltVideoFill, 0, 0,
+                      Width / 4, Height / 4,
+                      Width - (Width / 4) * 2, Height - (Height / 4) * 2, 0
+                      );
+      if (!EFI_ERROR (Status)) {
+        Count = (Stage == 10) ? 2 : 1;
+        X = (Width - (Count * 6 - 1) * Scale) / 2;
+        Y = (Height - 7 * Scale) / 2;
+        for (Index = 0; Index < Count; Index++) {
+          Digit = (Stage == 10) ? ((Index == 0) ? 1 : 0) : Stage;
+          for (Row = 0; Row < 7; Row++) {
+            for (Col = 0; Col < 5; Col++) {
+              if ((Digits[Digit][Row] & (1U << (4 - Col))) != 0) {
+                Gop->Blt (Gop, &Ink, EfiBltVideoFill, 0, 0,
+                          X + (Index * 6 + Col) * Scale, Y + Row * Scale,
+                          Scale, Scale, 0);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // This changes timing: record the last number, not only the last color.
+  // Stall uses a bounded busy delay rather than waiting for a UEFI timer event.
+  gBS->Stall (2000000);
+}
+
 EFI_STATUS
 EFIAPI
 UefiMain (
@@ -1503,6 +1591,8 @@ UefiMain (
 {
   EFI_STATUS  Status  = EFI_SUCCESS;
   UINT32      OSKMode = 0;
+
+  AuroraFrontPageStage (1);
 
   // Delete BootNext if entry to BootManager.
   Status = gRT->SetVariable (
@@ -1541,11 +1631,14 @@ UefiMain (
 
   // Force-connect all controllers.
   //
+  AuroraFrontPageStage (2);
   EfiBootManagerConnectAll ();
+  AuroraFrontPageStage (3);
 
   // Set console mode: *not* VGA, no splashscreen logo.
   // Insure Gop is in Big Display mode prior to accessing GOP.
   SetGraphicsConsoleMode (GCM_NATIVE_RES);
+  AuroraFrontPageStage (4);
 
   //
   // After the console is ready, get current video resolution
@@ -1635,8 +1728,10 @@ UefiMain (
 
   // Ensure screen is clear when switch Console from Graphics mode to Text mode
   //
+  AuroraFrontPageStage (5);
   gST->ConOut->EnableCursor (gST->ConOut, FALSE);
   gST->ConOut->ClearScreen (gST->ConOut);
+  AuroraFrontPageStage (6);
 
   // Initialize the Simple UI ToolKit.
   //
@@ -1647,6 +1742,8 @@ UefiMain (
     goto Exit;
   }
 
+  AuroraFrontPageStage (7);
+
   // Register Front Page strings with the HII database.
   //
   InitializeStringSupport ();
@@ -1654,6 +1751,7 @@ UefiMain (
   // Initialize HII data (ex: register strings, etc.).
   //
   InitializeFrontPage (TRUE);
+  AuroraFrontPageStage (8);
 
   // Initialize the FrontPage User Interface.
   //
@@ -1663,6 +1761,8 @@ UefiMain (
     DEBUG ((DEBUG_ERROR, "ERROR [FP]: Failed to initialize the FrontPage user interface.  Status = %r\r\n", Status));
     goto Exit;
   }
+
+  AuroraFrontPageStage (9);
 
   // Set the default form ID to show on the canvas.
   //
@@ -1691,6 +1791,7 @@ UefiMain (
 
 Exit:
 
+  AuroraFrontPageStage (10);
   return Status;
 }
 

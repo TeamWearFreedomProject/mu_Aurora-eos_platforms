@@ -113,3 +113,6 @@
   gSelunaPkgTokenSpaceGuid.PcdSystemIntegrityPolicyFile |{ 0x6a, 0x8d, 0xf9, 0xda, 0xe4, 0x6b, 0x60, 0x4b, 0xb8, 0x97, 0x4f, 0x16, 0xe4, 0x58, 0x62, 0x58 }|VOID*|0x00000a604
 
   gSelunaPkgTokenSpaceGuid.PcdABLProduct|"seluna"|VOID*|0x00000a605
+[PcdsFeatureFlag.common]
+  # Diagnostic markers default off; enabled explicitly by Aurora only.
+  gSelunaPkgTokenSpaceGuid.PcdAuroraFrontPageStageDiagnostic|FALSE|BOOLEAN|0x00000a606

@@ -1,5 +1,5 @@
 /** @file
-  Aurora-only diagnostic: draw a blue GOP marker once and hold before boot selection.
+  Aurora-only diagnostic: enter numbered-stage FrontPage and hold on return.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -10,6 +10,7 @@
 #undef DeviceBootManagerPriorityBoot
 
 #include <Library/BaseLib.h>
+#include <Library/UefiBootManagerLib.h>
 #include <Protocol/GraphicsOutput.h>
 
 STATIC
@@ -57,17 +58,21 @@ DeviceBootManagerPriorityBoot (
 {
   EFI_STATUS  Status;
 
-  (VOID)BootOption;
-
-  // Control experiment: do not prepare or start any boot application.
-  // Disable the UEFI watchdog before drawing; inherited hardware watchdogs,
-  // interrupts and previously scheduled events are not changed by this hook.
   Status = gBS->SetWatchdogTimer (0, 0, 0, NULL);
-  DEBUG ((DEBUG_INFO, "[Aurora blue-hold diagnostic] disable watchdog: %r\n", Status));
-
-  // Draw once, then hold. Repainting would hide a display-lifetime problem.
-  // No console print/clear follows the marker.
+  DEBUG ((DEBUG_INFO, "[Aurora FrontPage stages] disable watchdog: %r\n", Status));
   AuroraDiagnosticMarker (0, 80, 255);
+  gBS->Stall (2000000);
+
+  Status = MsBootOptionsLibGetBootManagerMenu (BootOption, NULL);
+  if (!EFI_ERROR (Status)) {
+    EfiBootManagerBoot (BootOption);
+    Status = BootOption->Status;
+    EfiBootManagerFreeLoadOption (BootOption);
+  }
+
+  Print (L"Aurora FP returned: %r\r\n", Status);
+  DEBUG ((DEBUG_ERROR, "[Aurora FrontPage stages] returned: %r\n", Status));
+  AuroraDiagnosticMarker (255, 0, 0);
   CpuDeadLoop ();
   return EFI_ABORTED;
 }

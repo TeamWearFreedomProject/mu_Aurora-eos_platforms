@@ -135,5 +135,15 @@
     "post_handoff_usb": "Owner reports USB disappeared and no device was recognized.",
     "interpretation": "Execution reached the diagnostic priority hook and could draw the blue GOP marker. The previous UFP-like USB outcome did not recur. This does not prove FrontPage entry or identify where execution/display stopped; option preparation, image loading/constructors, FrontPage initialization/rendering, display lifetime and reset remain unresolved.",
     "device_serials_redacted": true
+  },
+  "blue_hold_diagnostic_2026_09_30": {
+    "source_commit": "81e9339fb61bd5b4ef8d995bddb82b5950e00a0e",
+    "workflow_run": 36706737467,
+    "variant": "nosb",
+    "test_method": "Owner responded after temporary-boot instructions; command log and image hash not collected.",
+    "blue_marker_observed": true,
+    "blue_remained_visible_for_about_60_seconds_owner_report": true,
+    "usb_device_recognized_owner_report": false,
+    "interpretation": "A static GOP marker remained visible at the diagnostic BDS stop point. The added path used by the preceding FrontPage test is the next comparison target. Interrupts, other drivers, firmware memory safety and FrontPage execution are not proven by this result."
   }
 }

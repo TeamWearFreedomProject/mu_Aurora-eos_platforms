@@ -88,7 +88,10 @@
 !include SelunaPkg/Seluna.dsc.inc
 !include SelunaPkg/Frontpage.dsc.inc
 
-# Diagnostic only: attempt FrontPage directly and hold if it returns.
+[PcdsFeatureFlag.common]
+  gSelunaPkgTokenSpaceGuid.PcdAuroraFrontPageStageDiagnostic|TRUE
+
+# Diagnostic only: attempt instrumented FrontPage and hold if it returns.
 [LibraryClasses.common]
   DeviceBootManagerLib|AuroraPkg/Library/DeviceBootManagerLib/AuroraFrontPageDiagnostic.inf
 
