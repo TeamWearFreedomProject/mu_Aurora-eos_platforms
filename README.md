@@ -12,9 +12,9 @@ Pixel Watch 2 Wi-Fi（コードネーム **aurora**）向けの、実験中のUE
 | --- | --- |
 | Aurora専用UEFIのコンパイル | GitHub Actionsで成功 |
 | CP2A由来のメモリ配置・CPU・タイマー・一部ACPI | 静的解析とCIで検査 |
-| 実機への一時起動 | 以前の候補２種類がfastbootに受理された |
-| 実機の表示 | ロゴが一瞬見えた後、黒画面。UEFIメニューは未確認 |
-| USB | 暗転後、Windowsで `045E:066B` のWinUSB/UFPらしい機器として認識 |
+| 実機への一時起動 | 複数の候補が受理された。一時的なLoad Errorの原因は未確定 |
+| 実機の表示 | 番号付きFrontPage診断版で8まで表示され、そのまま残ったとの報告。メニューは未確認 |
+| USB | 以前の版では `045E:066B` を認識。最新の番号8到達時はUSB未認識との報告 |
 | Mass Storage / Windows起動 | 未確認 |
 
 以前の**タイマー診断版**は、UEFI内部に残っていたWatch 3由来の割り込み番号をCP2AのDTBに合わせて修正したものです。[ビルド結果と成果物（Run 36560298201）](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/actions/runs/36560298201)は成功していますが、実機では暗転と同じWinUSB認識が続きました。成功したビルドは実機での安全性や動作を保証しません。
@@ -30,7 +30,9 @@ Pixel Watch 2 Wi-Fi（コードネーム **aurora**）向けの、実験中のUE
 
 タイマー診断版は暗転とUFPらしいUSB認識が続きました。設定画面直行版では青い目印の後に暗転し、USBも認識されなくなったとの報告があります。この直行版は誤って `boot_b` に書き込まれ、その後、所有者が純正bootを戻しました。
 
-青保持版では、青い表示が約60秒維持され、USBは認識されなかったとの報告があります。現在は設定画面の初期化を数字と色で区切る診断版です。[番号の対応と観測方法](Platforms/AuroraPkg/Research/frontpage_numbered_stages_2026-09-30.md)を参照してください。成果物名は `aurora-CP2A-frontpage-stages-diagnostic-UNVERIFIED` です。この版の実機結果は未確認です。
+青保持版では、青い表示が約60秒維持され、USBは認識されなかったとの報告があります。現在は設定画面の初期化を数字と色で区切る診断版です。[番号の対応と観測方法](Platforms/AuroraPkg/Research/frontpage_numbered_stages_2026-09-30.md)を参照してください。この版は2026-10-01に実機で8まで進み、その表示が残り、USBは未認識との報告がありました。
+
+現在は8の後の警告・認証・メニュー描画を細分した診断版を準備しています。[細分番号の対応](Platforms/AuroraPkg/Research/frontpage_ui_substages_2026-10-01.md)を参照してください。成果物名は `aurora-CP2A-frontpage-ui-stages-diagnostic-UNVERIFIED` です。原因はまだ確定していません。
 
 ## 次に調べること
 

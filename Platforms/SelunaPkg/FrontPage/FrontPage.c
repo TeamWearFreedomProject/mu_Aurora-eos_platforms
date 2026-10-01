@@ -63,6 +63,8 @@
 
 #define FP_OSK_WIDTH_PERCENT  75            // On-screen keyboard is 75% the width of the screen.
 
+STATIC VOID AuroraFrontPageStage (IN UINTN Stage);
+
 UINTN       mCallbackKey;
 EFI_HANDLE  mImageHandle;
 
@@ -878,12 +880,20 @@ CreateTopMenu (
   )
 {
   EFI_FONT_INFO  FontInfo;
+  EFI_STATUS     AuthStatus;
+  BOOLEAN        PasswordAccepted;
 
   // Check whether there is a system password set.  If so, prompt the user for it before deciding the top-level menu list.
   // If the user doesn't know the password, they can dismiss the dialog and will see a limited-functionality menu.
   //
-  if (GetAuthToken (NULL) != EFI_SUCCESS) {
-    if (TRUE == ChallengeUserPassword (PcdGet8 (PcdMaxPasswordAttempts))) {
+  AuroraFrontPageStage (21);
+  AuthStatus = GetAuthToken (NULL);
+  AuroraFrontPageStage (22);
+  if (AuthStatus != EFI_SUCCESS) {
+    AuroraFrontPageStage (23);
+    PasswordAccepted = ChallengeUserPassword (PcdGet8 (PcdMaxPasswordAttempts));
+    AuroraFrontPageStage (24);
+    if (TRUE == PasswordAccepted) {
       mShowFullMenu = TRUE;
     }
   } else {
@@ -895,6 +905,7 @@ CreateTopMenu (
     }
   }
 
+  AuroraFrontPageStage (25);
   if (!mShowFullMenu) {
     PcdSetBoolS (PcdSetupUiReducedFunction, TRUE);
   }
@@ -938,6 +949,7 @@ CreateTopMenu (
   FontInfo.FontSize  = FP_MFRAME_MENU_TEXT_FONT_HEIGHT;
   FontInfo.FontStyle = EFI_HII_FONT_STYLE_NORMAL;
 
+  AuroraFrontPageStage (26);
   ListBox  *TopMenu = new_ListBox (
                         OrigX,
                         OrigY,
@@ -953,6 +965,8 @@ CreateTopMenu (
                         MenuOptions,
                         NULL
                         );
+
+  AuroraFrontPageStage (27);
 
   // Free HII string buffer.
   //
@@ -1208,6 +1222,7 @@ NotifyUserOfAlerts (
 
   // Check for SecureBoot notifications.
   //
+  AuroraFrontPageStage (31);
   DataSize  = sizeof (SecViolation);
   VarStatus = gRT->GetVariable (
                      SbViolationVarName,
@@ -1219,9 +1234,11 @@ NotifyUserOfAlerts (
 
   // Inform the user if there was a SecureBoot violation.
   //
+  AuroraFrontPageStage (32);
   if (SecViolation) {
     DEBUG ((DEBUG_INFO, "FrontPage::%a - SecureBoot violation detected! Warning user...\n", __FUNCTION__));
     SbViolationMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_SB_VIOLATION_WARNING), NULL);
+    AuroraFrontPageStage (33);
     Status             = SwmDialogsMessageBox (
                            (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_SB_VIOLATION_TITLE), NULL), // Dialog titlebar text.
                            SbViolationMessage,                                                                      // Dialog body text.
@@ -1230,6 +1247,7 @@ NotifyUserOfAlerts (
                            0,                                                                                       // No timeout
                            &SwmResult
                            );                           // Return result.
+    AuroraFrontPageStage (34);
   }
 
   // If the variable was found successfully, let's delete it so
@@ -1346,6 +1364,8 @@ InitializeFrontPageUI (
 
   // Establish initial FrontPage TitleBar and Master Frame dimensions based on the current screen size.
   //
+  AuroraFrontPageStage (11);
+
   mTitleBarWidth     = mBootHorizontalResolution;
   mTitleBarHeight    = ((mBootVerticalResolution   * FP_TBAR_HEIGHT_PERCENT)  / 100);
   mMasterFrameWidth  = ((mBootHorizontalResolution * FP_MFRAME_WIDTH_PERCENT) / 100);
@@ -1372,10 +1392,13 @@ InitializeFrontPageUI (
   // NOTE: This should come before CreateTopMenu() because it needs to happen before the
   //       Admin Password prompt.
   //
+  AuroraFrontPageStage (12);
   NotifyUserOfAlerts ();
+  AuroraFrontPageStage (13);
 
   // Create the top-level menu in the Master Frame.
   //
+  AuroraFrontPageStage (14);
   mTopMenu = CreateTopMenu (
                MasterFrameMenuOrigX,
                MasterFrameMenuOrigY,
@@ -1384,6 +1407,7 @@ InitializeFrontPageUI (
                CellTextXOffset
                );
 
+  AuroraFrontPageStage (15);
   ASSERT (NULL != mTopMenu);
   if (NULL == mTopMenu) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -1393,10 +1417,12 @@ InitializeFrontPageUI (
   // Render the TitleBar at the top of the screen.
   //
   RenderTitlebar ();
+  AuroraFrontPageStage (16);
 
   // Render the Master Frame and its Top-Level menu contents.
   //
   RenderMasterFrame ();
+  AuroraFrontPageStage (17);
 
   // Create the Master Frame notification event.  This event is signalled by the display engine to note that
   // there is a user input event outside the form area to consider.
@@ -1410,6 +1436,7 @@ InitializeFrontPageUI (
                   &mMasterFrameNotifyEvent
                   );
 
+  AuroraFrontPageStage (18);
   if (EFI_SUCCESS != Status) {
     DEBUG ((DEBUG_ERROR, "ERROR [FP]: Failed to create master frame notification event.  Status = %r\r\n", Status));
     goto Exit;
@@ -1418,6 +1445,7 @@ InitializeFrontPageUI (
   // Set shared pointer to user input context structure in a PCD so it can be shared.
   //
   PcdSet64S (PcdCurrentPointerState, (UINT64)(UINTN)&mDisplayEngineState);
+  AuroraFrontPageStage (19);
 
 Exit:
 
@@ -1537,7 +1565,7 @@ AuroraFrontPageStage (
     return;
   }
 
-  if ((Stage < 1) || (Stage > 10)) {
+  if ((Stage < 1) || (Stage > 99)) {
     return;
   }
 
@@ -1548,9 +1576,9 @@ AuroraFrontPageStage (
     Height = Gop->Mode->Info->VerticalResolution;
     Scale  = MIN (Width, Height) / 48;
     if (Scale != 0) {
-      Background.Red      = Colors[Stage - 1][0];
-      Background.Green    = Colors[Stage - 1][1];
-      Background.Blue     = Colors[Stage - 1][2];
+      Background.Red      = Colors[(Stage - 1) % 10][0];
+      Background.Green    = Colors[(Stage - 1) % 10][1];
+      Background.Blue     = Colors[(Stage - 1) % 10][2];
       Background.Reserved = 0;
       Status = Gop->Blt (
                       Gop, &Background, EfiBltVideoFill, 0, 0,
@@ -1558,11 +1586,11 @@ AuroraFrontPageStage (
                       Width - (Width / 4) * 2, Height - (Height / 4) * 2, 0
                       );
       if (!EFI_ERROR (Status)) {
-        Count = (Stage == 10) ? 2 : 1;
+        Count = (Stage >= 10) ? 2 : 1;
         X = (Width - (Count * 6 - 1) * Scale) / 2;
         Y = (Height - 7 * Scale) / 2;
         for (Index = 0; Index < Count; Index++) {
-          Digit = (Stage == 10) ? ((Index == 0) ? 1 : 0) : Stage;
+          Digit = (Stage >= 10) ? ((Index == 0) ? Stage / 10 : Stage % 10) : Stage;
           for (Row = 0; Row < 7; Row++) {
             for (Col = 0; Col < 5; Col++) {
               if ((Digits[Digit][Row] & (1U << (4 - Col))) != 0) {
@@ -1873,18 +1901,21 @@ GetAuthToken (
 {
   EFI_STATUS  Status;
 
+  AuroraFrontPageStage (41);
   Status = gBS->LocateProtocol (
                   &gDfciAuthenticationProtocolGuid,
                   NULL,
                   (VOID **)&mAuthProtocol
                   );
 
+  AuroraFrontPageStage (42);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a - Failed to locate MsAuthProtocol. Can't use check auth. %r\n", __FUNCTION__, Status));
     mAuthProtocol = NULL;
     return Status;
   }
 
+  AuroraFrontPageStage (43);
   if (PasswordBuffer != NULL) {
     Status = mAuthProtocol->AuthWithPW (mAuthProtocol, PasswordBuffer, StrLen (PasswordBuffer), &mAuthToken);
     DEBUG ((DEBUG_INFO, "%a Auth Token Acquired %x- %r\n", __FUNCTION__, mAuthToken, Status));
@@ -1893,7 +1924,9 @@ GetAuthToken (
     DEBUG ((DEBUG_INFO, "%a Auth Token Acquired with NULL Password %x - %r\n", __FUNCTION__, mAuthToken, Status));
   }
 
+  AuroraFrontPageStage (44);
   if (!EFI_ERROR (Status) && (mAuthToken != DFCI_AUTH_TOKEN_INVALID)) {
+    AuroraFrontPageStage (45);
     mFrontPageAuthTokenProtocol = (FRONT_PAGE_AUTH_TOKEN_PROTOCOL *)AllocateZeroPool (sizeof (mFrontPageAuthTokenProtocol));
 
     //
@@ -1910,6 +1943,7 @@ GetAuthToken (
                                                     NULL
                                                     );
 
+    AuroraFrontPageStage (46);
     if (Status == EFI_SUCCESS) {
       DEBUG ((DEBUG_INFO, "%a FrontPageAuthTokenProtocol was successfully installed %r\n", __FUNCTION__, Status));
     }
