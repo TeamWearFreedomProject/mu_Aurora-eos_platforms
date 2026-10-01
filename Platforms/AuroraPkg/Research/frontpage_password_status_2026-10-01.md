@@ -75,8 +75,9 @@ FrontPage component library override selects Aurora's diagnostic dialog library.
 Other modules and other platforms retain the upstream SwmDialogsLib.
 PasswordDialog.c, SwmDialogs.h and strings originate from microsoft/mu_plus
 commit `2761c3a83e441f439fb3d90e61972801495b1196`, under BSD-2-Clause-Patent.
-Unmodified dialog source files are small include wrappers around the pinned
-upstream source, avoiding divergent copies. FrontPage exports the feature-gated
+Unmodified dialog source files are exact local copies of the pinned upstream
+source. EDK2's string-token scan must see the source directly; include wrappers
+failed compilation because referenced string tokens were not generated. FrontPage exports the feature-gated
 marker to its diagnostic library. Removing the Aurora DEFINE restores upstream
 dialog selection; disabling the diagnostic PCD disables all stage marks.
 
