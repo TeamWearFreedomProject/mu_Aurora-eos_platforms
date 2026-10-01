@@ -78,4 +78,11 @@ AuroraFrontPageStage (
   IN UINTN Stage
   );
 
+// Callback setter supplied by the pinned build-time Canvas diagnostic patch.
+typedef VOID (*AURORA_CANVAS_DIAGNOSTIC_CALLBACK)(IN UINTN Stage);
+VOID
+AuroraCanvasSetDiagnosticCallback (
+  IN AURORA_CANVAS_DIAGNOSTIC_CALLBACK Callback
+  );
+
 #endif // _FRONT_PAGE_H_

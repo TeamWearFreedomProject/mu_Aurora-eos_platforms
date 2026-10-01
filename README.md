@@ -34,7 +34,7 @@ Pixel Watch 2 Wi-Fi（コードネーム **aurora**）向けの、実験中のUE
 
 8の後の警告・認証・メニュー描画を細分した診断版は実機で23に到達し、その表示が残ったとの報告がありました。これは認証失敗の分岐を通った証拠で、パスワード設定や入力待ち到達の証拠ではありません。[細分番号の対応](Platforms/AuroraPkg/Research/frontpage_ui_substages_2026-10-01.md)を参照してください。現在は認証の返り値の分類を下段に表示し、パスワード画面の準備・描画・入力待ちを上段の数字で細分する診断版です。[2段表示と番号の対応](Platforms/AuroraPkg/Research/frontpage_password_status_2026-10-01.md)を参照してください。この版は実機で上段82・下段62が残ったとの報告がありました。初回認証がデバイスエラーを返し、画面のテーマ設定が戻ったことを示します。
 
-現在はパスワード画面の文字・入力欄・ボタン作成と枠描画を3桁の上段番号で細分した診断版です。[番号と観測方法](Platforms/AuroraPkg/Research/frontpage_password_controls_2026-10-01.md)を参照してください。この版は実機で上段132・下段62が残ったとの報告がありました。現在は文字表示版で、処理名・呼び出し前後・初回認証と直近のUI処理の返り値を表示します。[文字表示と新しい境界番号](Platforms/AuroraPkg/Research/frontpage_text_diagnostic_2026-10-01.md)を参照してください。成果物名は `aurora-CP2A-text-diagnostic-UNVERIFIED` です。原因はまだ確定していません。
+現在はパスワード画面の文字・入力欄・ボタン作成と枠描画を3桁の上段番号で細分した診断版です。[番号と観測方法](Platforms/AuroraPkg/Research/frontpage_password_controls_2026-10-01.md)を参照してください。この版は実機で上段132・下段62が残ったとの報告がありました。現在は文字表示版で、処理名・呼び出し前後・初回認証と直近のUI処理の返り値を表示します。[文字表示と新しい境界番号](Platforms/AuroraPkg/Research/frontpage_text_diagnostic_2026-10-01.md)を参照してください。成果物名は `aurora-CP2A-default-control-diagnostic-UNVERIFIED` です。写真で137（SET DEFAULTの直前）とキャンセル登録成功を確認しました。現在は既定ボタン設定の内部を171–178で分ける版です。[内部の番号と観測方法](Platforms/AuroraPkg/Research/frontpage_default_control_2026-10-01.md)を参照してください。原因はまだ確定していません。
 
 ## 次に調べること
 

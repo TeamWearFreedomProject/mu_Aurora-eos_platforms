@@ -1656,6 +1656,9 @@ UefiMain (
   EFI_STATUS  Status  = EFI_SUCCESS;
   UINT32      OSKMode = 0;
 
+  if (FeaturePcdGet (PcdAuroraFrontPageStageDiagnostic)) {
+    AuroraCanvasSetDiagnosticCallback (AuroraFrontPageStage);
+  }
   AuroraFrontPageStage (1);
 
   // Delete BootNext if entry to BootManager.
