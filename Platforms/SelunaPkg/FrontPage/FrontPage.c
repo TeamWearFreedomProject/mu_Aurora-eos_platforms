@@ -1580,7 +1580,7 @@ AuroraFrontPageStage (
     return;
   }
 
-  if ((Stage < 1) || (Stage > 99)) {
+  if ((Stage < 1) || (Stage > 999)) {
     return;
   }
 
@@ -1601,11 +1601,15 @@ AuroraFrontPageStage (
                       Width - (Width / 4) * 2, Height - (Height / 4) * 2, 0
                       );
       if (!EFI_ERROR (Status)) {
-        Count = (Stage >= 10) ? 2 : 1;
+        Count = (Stage >= 100) ? 3 : ((Stage >= 10) ? 2 : 1);
         X = (Width - (Count * 6 - 1) * Scale) / 2;
         Y = (mAuroraAuthStatusCode == 0) ? (Height - 7 * Scale) / 2 : Height / 2 - 11 * Scale;
         for (Index = 0; Index < Count; Index++) {
-          Digit = (Stage >= 10) ? ((Index == 0) ? Stage / 10 : Stage % 10) : Stage;
+          if (Count == 3) {
+            Digit = (Index == 0) ? Stage / 100 : ((Index == 1) ? (Stage / 10) % 10 : Stage % 10);
+          } else {
+            Digit = (Count == 2) ? ((Index == 0) ? Stage / 10 : Stage % 10) : Stage;
+          }
           for (Row = 0; Row < 7; Row++) {
             for (Col = 0; Col < 5; Col++) {
               if ((Digits[Digit][Row] & (1U << (4 - Col))) != 0) {

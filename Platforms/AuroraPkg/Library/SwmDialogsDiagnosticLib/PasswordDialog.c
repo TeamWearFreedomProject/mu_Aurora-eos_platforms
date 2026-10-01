@@ -171,11 +171,13 @@ CreateDialogControls (
 
   // Create a canvas for hosting the password dialog child controls.
   //
+  AuroraFrontPageStage (110);
   DialogCanvas = new_Canvas (
                    DialogBounds,
                    &DialogTheme.DialogBackGroundColor
                    );
 
+  AuroraFrontPageStage (111);
   if (NULL == DialogCanvas) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
@@ -196,12 +198,15 @@ CreateDialogControls (
 
   // Select an appropriate font and colors for the caption text (larger font than the body).
   //
+  AuroraFrontPageStage (112);
   FontInfo.FontSize    = SWM_PWD_CUSTOM_FONT_CAPTION_HEIGHT;
+  AuroraFrontPageStage (113);
   FontInfo.FontStyle   = EFI_HII_FONT_STYLE_NORMAL;
   FontInfo.FontName[0] = L'\0';
 
   // Draw Password Dialog CAPTION.
   //
+  AuroraFrontPageStage (114);
   CaptionLabel = new_Label (
                    ControlOrigX,
                    ControlOrigY,
@@ -213,6 +218,7 @@ CreateDialogControls (
                    pCaptionText
                    );
 
+  AuroraFrontPageStage (115);
   if (NULL == CaptionLabel) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
@@ -231,6 +237,8 @@ CreateDialogControls (
                        CaptionLabel,
                        &ControlBounds
                        );
+
+  AuroraFrontPageStage (116);
 
   // Calculate the appropriate place to put the dialog's body text.
   //
@@ -251,6 +259,7 @@ CreateDialogControls (
 
   // Draw Password Dialog BODY TEXT.
   //
+  AuroraFrontPageStage (118);
   BodyLabel = new_Label (
                 ControlOrigX,
                 ControlOrigY,
@@ -262,6 +271,7 @@ CreateDialogControls (
                 pBodyText
                 );
 
+  AuroraFrontPageStage (119);
   if (NULL == BodyLabel) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
@@ -280,6 +290,8 @@ CreateDialogControls (
                     BodyLabel,
                     &ControlBounds
                     );
+
+  AuroraFrontPageStage (120);
 
   // Calculate the appropriate place to put the dialog's password editbox.
   //
@@ -381,6 +393,7 @@ CreateDialogControls (
 
       // Create the editbox for current password input.
       //
+      AuroraFrontPageStage (121);
       mCurrentPassword = new_EditBox (
                            ControlOrigX,
                            ControlOrigY,
@@ -396,6 +409,7 @@ CreateDialogControls (
                            NULL
                            );
 
+      AuroraFrontPageStage (122);
       if (NULL == mCurrentPassword) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Exit;
@@ -420,6 +434,8 @@ CreateDialogControls (
     }
   }
 
+  AuroraFrontPageStage (123);
+
   // Select an appropriate font and colors for the error text.
   //
   FontInfo.FontSize  = SWM_PWD_CUSTOM_FONT_BODY_HEIGHT;
@@ -427,6 +443,7 @@ CreateDialogControls (
 
   // Draw Password Dialog ERROR TEXT.
   //
+  AuroraFrontPageStage (124);
   mErrorLabel = new_Label (
                   ControlOrigX,
                   ControlOrigY,
@@ -438,6 +455,7 @@ CreateDialogControls (
                   pErrorText
                   );
 
+  AuroraFrontPageStage (125);
   if (NULL == mErrorLabel) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
@@ -459,6 +477,7 @@ CreateDialogControls (
 
   // Calculate the string bitmap size of the largest button text.
   //
+  AuroraFrontPageStage (126);
   Status = GetTextStringBitmapSize (
              SWM_PWD_OK_TEXT_STRING,
              &FontInfo,
@@ -470,6 +489,7 @@ CreateDialogControls (
              &MaxGlyphDescent
              );
 
+  AuroraFrontPageStage (127);
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -484,6 +504,7 @@ CreateDialogControls (
   ControlOrigY      = (DialogOrigY + DialogHeight) - ((DialogHeight * SWM_PWD_DIALOG_FIRST_BUTTON_Y_PERCENT) / 100);
 
   // check that the controls will fit in the dialog
+  AuroraFrontPageStage (128);
   if ( TotalControlWidth > DialogWidth ) {
     DEBUG ((DEBUG_ERROR, "[%a] - ERROR: The controls are too large for the password dialog box, adjust your fonts.\n", __FUNCTION__));
     ASSERT (FALSE);
@@ -491,6 +512,7 @@ CreateDialogControls (
 
   // Draw the OK Button.
   //
+  AuroraFrontPageStage (129);
   OKButton = new_Button (
                ControlOrigX,
                ControlOrigY,
@@ -508,6 +530,7 @@ CreateDialogControls (
                (VOID *)SWM_MB_IDOK                      // TODO - not the best way to do this.
                );
 
+  AuroraFrontPageStage (130);
   if (NULL == OKButton) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
@@ -526,6 +549,7 @@ CreateDialogControls (
   //
   ControlOrigX += (ControlWidth + ((ControlWidth * SWM_PWD_DIALOG_BUTTON_SPACE_PERCENT) / 100));
 
+  AuroraFrontPageStage (131);
   CancelButton = new_Button (
                    ControlOrigX,
                    ControlOrigY,
@@ -543,6 +567,7 @@ CreateDialogControls (
                    (VOID *)SWM_MB_IDCANCEL                      // TODO - not the best way to do this.
                    );
 
+  AuroraFrontPageStage (132);
   if (NULL == CancelButton) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
@@ -582,6 +607,7 @@ CreateDialogControls (
   // Return the pointer to the canvas.
   //
   *DialogCanvasOut = DialogCanvas;
+  AuroraFrontPageStage (133);
 
 Exit:
 
@@ -614,6 +640,8 @@ DrawDialogFrame (
   SWM_RECT               Rect[4];
   INTN                   Index;
 
+  AuroraFrontPageStage (151);
+
   // For performance reasons, drawing the frame as four individual (small) rectangles is faster than a single large rectangle.
   //
   SWM_RECT_INIT (Rect[0], FrameRect.Left, FrameRect.Top, FrameRect.Right, CanvasRect.Top);       // Top
@@ -621,6 +649,7 @@ DrawDialogFrame (
   SWM_RECT_INIT (Rect[2], CanvasRect.Right, CanvasRect.Top, FrameRect.Right, CanvasRect.Bottom); // Right
   SWM_RECT_INIT (Rect[3], FrameRect.Left, CanvasRect.Bottom, FrameRect.Right, FrameRect.Bottom); // Bottom
 
+  AuroraFrontPageStage (152);
   for (Index = 0; Index < 4; Index++) {
     this->BltWindow (
             this,
@@ -636,6 +665,8 @@ DrawDialogFrame (
             0
             );
   }
+
+  AuroraFrontPageStage (153);
 
   // For performance reasons, the canvas has been designed not to paint the entire dialog background.  Instead it only knows how to clear
   // current child control bounding rectanges.  So we fill in the entire dialog background once, here.
@@ -654,11 +685,14 @@ DrawDialogFrame (
           0
           );
 
+  AuroraFrontPageStage (154);
+
   // Draw titlebar text.
   //
   pBltBuffer = (EFI_IMAGE_OUTPUT *)AllocateZeroPool (sizeof (EFI_IMAGE_OUTPUT));
 
   ASSERT (pBltBuffer != NULL);
+  AuroraFrontPageStage (155);
   if (NULL == pBltBuffer) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
@@ -683,6 +717,7 @@ DrawDialogFrame (
   UINT32    MaxDescent;
   SWM_RECT  StringRect;
 
+  AuroraFrontPageStage (156);
   Status = GetTextStringBitmapSize (
              pTitleBarText,
              &StringInfo.FontInfo,
@@ -694,6 +729,7 @@ DrawDialogFrame (
              &MaxDescent
              );
 
+  AuroraFrontPageStage (157);
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -703,6 +739,7 @@ DrawDialogFrame (
   UINT32  FrameWidth     = SWM_RECT_WIDTH (FrameRect);
   UINT32  TitleBarHeight = (CanvasRect.Top - FrameRect.Top);
 
+  AuroraFrontPageStage (158);
   this->StringToWindow (
           this,
           gImageHandle,
@@ -718,6 +755,8 @@ DrawDialogFrame (
           NULL,
           NULL
           );
+
+  AuroraFrontPageStage (159);
 
 Exit:
 
@@ -758,8 +797,11 @@ CreatePasswordDialog (
   )
 {
   EFI_STATUS  Status       = EFI_SUCCESS;
-  UINT32      DialogHeight = SWM_RECT_HEIGHT (FrameRect);
+  UINT32      DialogHeight;
   SWM_RECT    CanvasRect;
+
+  AuroraFrontPageStage (100);
+  DialogHeight = SWM_RECT_HEIGHT (FrameRect);
 
   // Since we have a dialog titlebar and frame, the actual canvas area of the dialog is smaller.
   //
@@ -773,6 +815,7 @@ CreatePasswordDialog (
 
   // Create a canvas and all of the child controls that make up the Password Dialog.
   //
+  AuroraFrontPageStage (101);
   Status = CreateDialogControls (
              this,
              CanvasRect,
@@ -784,6 +827,7 @@ CreatePasswordDialog (
              DialogCanvasOut                           // Use the caller's parameter to store the canvas pointer.
              );
 
+  AuroraFrontPageStage (134);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "ERROR [SWM]: Failed to create Password Dialog controls (%r).\r\n", Status));
     goto Exit;
@@ -791,6 +835,7 @@ CreatePasswordDialog (
 
   // Draw the dialog body and frame.
   //
+  AuroraFrontPageStage (141);
   DrawDialogFrame (
     this,
     FrameRect,
@@ -798,6 +843,8 @@ CreatePasswordDialog (
     pTitleBarText,
     DialogTheme
     );
+
+  AuroraFrontPageStage (142);
 
 Exit:
 
