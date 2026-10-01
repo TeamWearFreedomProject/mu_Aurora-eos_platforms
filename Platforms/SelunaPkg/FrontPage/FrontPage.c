@@ -1657,7 +1657,7 @@ UefiMain (
   UINT32      OSKMode = 0;
 
   if (FeaturePcdGet (PcdAuroraFrontPageStageDiagnostic)) {
-    AuroraCanvasSetDiagnosticCallback (AuroraFrontPageStage);
+    AuroraCanvasSetDiagnosticCallback (AuroraFrontPageStage, AuroraDiagnosticCallResult);
   }
   AuroraFrontPageStage (1);
 
