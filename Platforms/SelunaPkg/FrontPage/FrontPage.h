@@ -72,4 +72,10 @@ GetAuthToken (
   CHAR16  *PasswordBuffer
   );
 
+// Feature-gated GOP stage marker, also used by Aurora's diagnostic dialog library.
+VOID
+AuroraFrontPageStage (
+  IN UINTN Stage
+  );
+
 #endif // _FRONT_PAGE_H_

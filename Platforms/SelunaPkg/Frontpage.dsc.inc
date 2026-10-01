@@ -190,7 +190,14 @@
   #
   # Application that presents and manages FrontPage.
   #
+!ifdef $(AURORA_FRONTPAGE_PASSWORD_DIAGNOSTIC)
+  SelunaPkg/FrontPage/FrontPage.inf {
+    <LibraryClasses>
+      SwmDialogsLib|AuroraPkg/Library/SwmDialogsDiagnosticLib/SwmDialogs.inf
+  }
+!else
   SelunaPkg/FrontPage/FrontPage.inf
+!endif
   # Surface Boot Manager (Menu) application
   #
   # Application that presents & manages the Boot Menu Setup on Front Page.

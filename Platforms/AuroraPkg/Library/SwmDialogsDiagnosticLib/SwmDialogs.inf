@@ -1,0 +1,63 @@
+## @file
+#  SwmDialogs.inf
+#
+#  Description:    Library to provide Dialog Boxes in a Simple Window Manager
+#                  environment.
+#
+# Copyright (C) Microsoft Corporation. All rights reserved.
+## SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SwmDialogsLib
+  FILE_GUID                      = 9e87d0e9-607e-45d0-a465-4aa8fbf4f48e
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SwmDialogsLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = SwmDialogsConstructor
+  DESTRUCTOR                     = SwmDialogsDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SwmDialogs.c
+  SwmDialogs.h
+  MessageBox.c
+  PasswordDialog.c
+  SemmUserAuthDialog.c
+  SingleSelectDialog.c
+  SwmDialogsStrings.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MsGraphicsPkg/MsGraphicsPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+  MemoryAllocationLib
+  MsColorTableLib
+  MsUiThemeLib
+  UIToolKitLib
+  UefiBootServicesTableLib
+
+
+[Protocols]
+  gMsSWMProtocolGuid
+  gMsOSKProtocolGuid
+  gEfiSimpleTextInputExProtocolGuid
+
+[Guids]
+
+[Pcd]
+
+[Depex]
+
+[BuildOptions]
+#  *_VS2015x86_*_CC_FLAGS       = /Od /FAcs

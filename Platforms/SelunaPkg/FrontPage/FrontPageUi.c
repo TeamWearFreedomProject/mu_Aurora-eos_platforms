@@ -703,9 +703,16 @@ ChallengeUserPassword (
 {
   EFI_STATUS     Status;
   SWM_MB_RESULT  SwmResult = 0;
-  CHAR16         *pErrorMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_NULL_STRING), NULL);
+  CHAR16         *pErrorMessage;
+  CHAR16         *TitleText;
+  CHAR16         *CaptionText;
+  CHAR16         *BodyText;
   CHAR16         *PasswordBuffer = NULL;           // This will be allocated by PasswordPrompt(). Needs to be tracked, wiped, and freed.
   BOOLEAN        Result = FALSE, AttemptsExpired = FALSE;
+
+  AuroraFrontPageStage (51);
+  pErrorMessage = (CHAR16 *)HiiGetString (gStringPackHandle, STRING_TOKEN (STR_NULL_STRING), NULL);
+  AuroraFrontPageStage (52);
 
   // Primary UI loop.
   // Display prompt. Process results.
@@ -714,15 +721,21 @@ ChallengeUserPassword (
   do {
     // Present the password dialog to prompt the user.
     //
+    TitleText = HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ENTER_PWD_TITLEBARTEXT), NULL);
+    CaptionText = HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_CAPTION), NULL);
+    BodyText = HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ENTER_BODYTEXT), NULL);
+    AuroraFrontPageStage (53);
     Status = SwmDialogsPasswordPrompt (
-               HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ENTER_PWD_TITLEBARTEXT), NULL),                               // Dialog titlebar text.
-               HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_CAPTION), NULL),                                              // Dialog caption text.
-               HiiGetString (gStringPackHandle, STRING_TOKEN (STR_PWD_ENTER_BODYTEXT), NULL),                                       // Dialog body text.
+               TitleText,
+               CaptionText,
+               BodyText,
                pErrorMessage,
                SWM_PWD_TYPE_PROMPT_PASSWORD,
                &SwmResult,
                &PasswordBuffer
                );
+
+    AuroraFrontPageStage (54);
 
     // Check for errors and whether the user selected cancel.
     //

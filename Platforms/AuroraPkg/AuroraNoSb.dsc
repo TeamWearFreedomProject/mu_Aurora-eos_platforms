@@ -15,6 +15,7 @@
 #
 ################################################################################
 [Defines]
+  DEFINE AURORA_FRONTPAGE_PASSWORD_DIAGNOSTIC = TRUE
   PLATFORM_NAME                  = Aurora
   PLATFORM_GUID                  = b6325ac2-9f3f-4b1d-b129-ac7b35ddde60
   PLATFORM_VERSION               = 0.1

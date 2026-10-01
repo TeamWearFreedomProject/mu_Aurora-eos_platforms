@@ -63,7 +63,7 @@
 
 #define FP_OSK_WIDTH_PERCENT  75            // On-screen keyboard is 75% the width of the screen.
 
-STATIC VOID AuroraFrontPageStage (IN UINTN Stage);
+STATIC UINTN mAuroraAuthStatusCode = 0;
 
 UINTN       mCallbackKey;
 EFI_HANDLE  mImageHandle;
@@ -888,6 +888,22 @@ CreateTopMenu (
   //
   AuroraFrontPageStage (21);
   AuthStatus = GetAuthToken (NULL);
+  // Lower row is the return status class, not another execution stage.
+  if (FeaturePcdGet (PcdAuroraFrontPageStageDiagnostic)) {
+    switch (AuthStatus) {
+      case EFI_SUCCESS:            mAuroraAuthStatusCode = 0;  break;
+      case EFI_NOT_FOUND:          mAuroraAuthStatusCode = 61; break;
+      case EFI_DEVICE_ERROR:       mAuroraAuthStatusCode = 62; break;
+      case EFI_SECURITY_VIOLATION: mAuroraAuthStatusCode = 63; break;
+      case EFI_OUT_OF_RESOURCES:   mAuroraAuthStatusCode = 64; break;
+      case EFI_ACCESS_DENIED:      mAuroraAuthStatusCode = 65; break;
+      case EFI_UNSUPPORTED:        mAuroraAuthStatusCode = 66; break;
+      case EFI_NOT_READY:          mAuroraAuthStatusCode = 67; break;
+      default:                    mAuroraAuthStatusCode = 68; break;
+    }
+    DEBUG ((DEBUG_ERROR, "[Aurora auth status] GetAuthToken(NULL): %r, class %u\n",
+            AuthStatus, mAuroraAuthStatusCode));
+  }
   AuroraFrontPageStage (22);
   if (AuthStatus != EFI_SUCCESS) {
     AuroraFrontPageStage (23);
@@ -1528,7 +1544,6 @@ ProcessBootNext (
   Best-effort, font-independent stage marker for Aurora diagnostics.
   Numbers use GOP rectangles, so HII fonts and the UI toolkit are not needed.
 **/
-STATIC
 VOID
 AuroraFrontPageStage (
   IN UINTN Stage
@@ -1588,7 +1603,7 @@ AuroraFrontPageStage (
       if (!EFI_ERROR (Status)) {
         Count = (Stage >= 10) ? 2 : 1;
         X = (Width - (Count * 6 - 1) * Scale) / 2;
-        Y = (Height - 7 * Scale) / 2;
+        Y = (mAuroraAuthStatusCode == 0) ? (Height - 7 * Scale) / 2 : Height / 2 - 11 * Scale;
         for (Index = 0; Index < Count; Index++) {
           Digit = (Stage >= 10) ? ((Index == 0) ? Stage / 10 : Stage % 10) : Stage;
           for (Row = 0; Row < 7; Row++) {
@@ -1597,6 +1612,23 @@ AuroraFrontPageStage (
                 Gop->Blt (Gop, &Ink, EfiBltVideoFill, 0, 0,
                           X + (Index * 6 + Col) * Scale, Y + Row * Scale,
                           Scale, Scale, 0);
+              }
+            }
+          }
+        }
+        if (mAuroraAuthStatusCode != 0) {
+          // Two rows: execution stage above, auth return-status class below.
+          X = (Width - 11 * Scale) / 2;
+          Y = Height / 2 + Scale;
+          for (Index = 0; Index < 2; Index++) {
+            Digit = (Index == 0) ? mAuroraAuthStatusCode / 10 : mAuroraAuthStatusCode % 10;
+            for (Row = 0; Row < 7; Row++) {
+              for (Col = 0; Col < 5; Col++) {
+                if ((Digits[Digit][Row] & (1U << (4 - Col))) != 0) {
+                  Gop->Blt (Gop, &Ink, EfiBltVideoFill, 0, 0,
+                            X + (Index * 6 + Col) * Scale, Y + Row * Scale,
+                            Scale, Scale, 0);
+                }
               }
             }
           }
