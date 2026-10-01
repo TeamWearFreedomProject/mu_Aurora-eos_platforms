@@ -1,4 +1,4 @@
-# Pixel Watch 2 (Aurora) UEFI port — by Kyogo
+# KyogoのPixel Watch 2 UEFI移植プロジェクト
 
 **Kyogoが進めている、Pixel Watch 2 Wi-Fi向けのUEFI移植プロジェクトです。**  
 目標は、UEFIからLinuxカーネルを起動し、再現できる形で他の人にも共有すること。
