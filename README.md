@@ -1,12 +1,38 @@
-# Pixel Watch 2 (Aurora) UEFI port
+# Pixel Watch 2 (Aurora) UEFI port — by Kyogo
 
-> ⭐︎ このプロジェクトは個人が **ChatGPTと協力して** 学習・実験として進めています。解析、コード、文書にもAIの支援を使っています。まだ開発途中なので、完成版の配布や個別サポートは約束できません。
+**Kyogoが企画・実機検証・開発の進行を担当している、Pixel Watch 2 Wi-Fi向けのUEFI移植プロジェクトです。**  
+UEFIからLinuxカーネルを起動し、再現できる形で共有することを目指しています。
 
-**Watch 2移植の作業は [`Aurora&eos-port` ブランチ](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/tree/Aurora%26eos-port)で進めています。** 現在の `main` は元のWatch 3向けコードが中心の古いブランチです。
+> ⭐︎ ChatGPT／Codexと協力して開発中。コード・解析・診断・文書作成にもAIの支援を使っています。完成版や個別サポートは約束できません。
 
-- [Watch 2の現状・成果物・次の課題を読む](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/blob/Aurora%26eos-port/README.md)
-- [直近のタイマー診断ビルド](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/actions/runs/36560298201)
+## ここまでの成果 — 2026-10-01
 
-Watch 2ではロゴが一瞬表示され、USBがUFPらしい機器として認識された段階です。**安定したUEFIメニュー、Mass Storage、Windows起動は未確認**です。Pixel Watch 3向けのガイドやイメージをWatch 2用と取り違えないでください。
+暗転だけの状態から、実機の処理を数字と文字で追えるようになりました。
 
-元プロジェクト：[WOA-Project/mu_seluna_platforms](https://github.com/WOA-Project/mu_seluna_platforms)
+- Aurora向けUEFIのビルドとイメージ構造検査が成功。
+- 複数の診断版がPixel Watch 2実機の一時起動で受理された。
+- 最新の実機写真は **214 / BUTTON TEXT / BEFORE CALL**。
+- OKボタンの枠描画は戻り、背景塗りつぶしは **EFI_SUCCESS**。文字描画から戻った表示は未確認。
+- 初回認証のEFI_DEVICE_ERRORを確認。描画の返り値とは別に調査中。
+
+**設定画面の完成、Mass Storage、このUEFIからのLinux・Windows起動はまだ確認できていません。**
+
+## 詳細と成果物
+
+- [**Watch 2移植のREADME**](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/blob/Aurora%26eos-port/README.md)
+- [**実機結果と診断の歩み**](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/blob/Aurora%26eos-port/PROGRESS.md)
+- [最新の成功ビルドと成果物](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/actions/runs/36820130452)
+
+最新の `aurora-CP2A-string-window-diagnostic-UNVERIFIED` は、文字描画の内部をさらに分ける版です。ビルド・構造検査は成功していますが、この新しい版の実機結果は未確認です。成果物は研究用の一時起動候補です。
+
+**作業コードは[`Aurora&eos-port`ブランチ](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/tree/Aurora%26eos-port)にあります。** この `main` のコードは元のWatch 3向け構成が中心です。Watch 3向けバイナリをWatch 2用と取り違えないでください。
+
+## 開発者と謝辞
+
+Watch 2移植の企画・開発の進行・実機検証は **Kyogo** が担当しています。
+
+コードの土台は[WOA-Project / mu_seluna_platforms](https://github.com/WOA-Project/mu_seluna_platforms)・DuoWoA authorsと、Microsoftの[Project Mu](https://microsoft.github.io/mu/)です。[PixelWatch-Guides](https://github.com/WOA-Project/PixelWatch-Guides)も参考にしています。
+
+[**作者・参考資料・元プロジェクトの協力者への謝辞**](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/blob/Aurora%26eos-port/CREDITS.md)
+
+既存コードの著作権とライセンスを保持しています。このWatch 2移植を元プロジェクトが承認・保証しているという意味ではありません。
