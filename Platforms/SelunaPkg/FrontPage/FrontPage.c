@@ -10,6 +10,7 @@
 #include <Uefi.h>
 #include <UefiSecureBoot.h>
 #include "FrontPage.h"
+#include "AuroraStringDiagnosticProtocol.h"
 #include "String.h"
 #include "FrontPageUi.h"
 #include "FrontPageConfigAccess.h"
@@ -64,6 +65,9 @@
 
 #define FP_OSK_WIDTH_PERCENT  75            // On-screen keyboard is 75% the width of the screen.
 
+STATIC EFI_HANDLE mAuroraStringDiagnosticHandle = NULL;
+STATIC BOOLEAN mAuroraStringDiagnosticArmed = FALSE;
+STATIC EFI_STATUS mAuroraStringDiagnosticInstallStatus = EFI_NOT_READY;
 STATIC UINTN mAuroraAuthStatusCode = 0;
 STATIC EFI_STATUS mAuroraInitialAuthStatus = EFI_SUCCESS;
 STATIC BOOLEAN mAuroraInitialAuthRecorded = FALSE;
@@ -1564,6 +1568,22 @@ AuroraDiagnosticCallResult (
   }
 }
 
+STATIC
+BOOLEAN
+AuroraStringDiagnosticIsArmed (
+  VOID
+  )
+{
+  return mAuroraStringDiagnosticArmed;
+}
+
+STATIC AURORA_STRING_DIAGNOSTIC_PROTOCOL mAuroraStringDiagnostic = {
+  AURORA_STRING_DIAGNOSTIC_REVISION,
+  AuroraStringDiagnosticIsArmed,
+  AuroraFrontPageStage,
+  AuroraDiagnosticCallResult
+};
+
 /**
   Best-effort readable diagnostic text, independent of the UI under test.
   The boundary is displayed before its delay; a BEFORE label does not prove
@@ -1601,6 +1621,16 @@ AuroraFrontPageStage (
       Boundary = mAuroraStageText[Index].Boundary;
       break;
     }
+  }
+  // Arm only the Button StringToWindow call, not earlier dialog text rendering.
+  if (Stage == 214) {
+    mAuroraStringDiagnosticArmed = TRUE;
+    if (mAuroraStringDiagnosticHandle == NULL) {
+      Operation = "TRACE UNAVAILABLE";
+      AuroraDiagnosticCallResult ("TRACE INSTALL", mAuroraStringDiagnosticInstallStatus);
+    }
+  } else if (Stage == 215) {
+    mAuroraStringDiagnosticArmed = FALSE;
   }
   DEBUG ((DEBUG_INFO, "[Aurora stage] %u %a %a\n", (UINT32)Stage, Operation, Boundary));
   Status = gBS->LocateProtocol (&gEfiGraphicsOutputProtocolGuid, NULL, (VOID **)&Gop);
@@ -1658,6 +1688,10 @@ UefiMain (
 
   if (FeaturePcdGet (PcdAuroraFrontPageStageDiagnostic)) {
     AuroraCanvasSetDiagnosticCallback (AuroraFrontPageStage, AuroraDiagnosticCallResult);
+    mAuroraStringDiagnosticInstallStatus = gBS->InstallProtocolInterface (
+      &mAuroraStringDiagnosticHandle, &mAuroraStringDiagnosticGuid,
+      EFI_NATIVE_INTERFACE, &mAuroraStringDiagnostic);
+    DEBUG ((DEBUG_INFO, "[Aurora string trace] install %r\n", mAuroraStringDiagnosticInstallStatus));
   }
   AuroraFrontPageStage (1);
 
@@ -1858,6 +1892,12 @@ UefiMain (
 
 Exit:
 
+  mAuroraStringDiagnosticArmed = FALSE;
+  if (mAuroraStringDiagnosticHandle != NULL) {
+    gBS->UninstallProtocolInterface (
+      mAuroraStringDiagnosticHandle, &mAuroraStringDiagnosticGuid, &mAuroraStringDiagnostic);
+    mAuroraStringDiagnosticHandle = NULL;
+  }
   AuroraFrontPageStage (10);
   return Status;
 }

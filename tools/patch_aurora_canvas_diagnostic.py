@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply Canvas and Button diagnostics to the pinned mu_plus build checkout.
+"""Apply Canvas, Button and StringToWindow diagnostics to pinned mu_plus.
 
 Only diagnostic FrontPage installs the library-instance callbacks.
 Validate all transformations before writing either upstream source file.
@@ -20,16 +20,21 @@ BUTTON_DRAW_ORIGINAL = "static\nOBJECT_STATE\nDraw (\n  IN    Button           *
 BUTTON_DRAW_REPLACEMENT = "static\nOBJECT_STATE\nDraw (\n  IN    Button           *this,\n  IN    BOOLEAN          DrawHighlight,\n  IN    SWM_INPUT_STATE  *pInputState,\n  OUT   VOID             **pSelectionContext\n  )\n{\n  SWM_RECT  *pRect   = NULL;\n  VOID      *Context = NULL;\n\n  AuroraCanvasDiagnosticStage (181);\n  pRect = &this->m_pButton->ButtonBounds;\n\n  // If there is no input state, simply draw the button then return.\n  //\n  if ((NULL == pInputState) || (this->m_pButton->State == GRAYED)) {\n    AuroraCanvasDiagnosticStage (182);\n    RenderButton (\n      this,\n      DrawHighlight\n      );\n\n    AuroraCanvasDiagnosticStage (183);\n    goto Exit;\n  }\n\n  // If there is user keyboard input, handle it here.  For buttons, we only recognize\n  // <ENTER> and <SPACE> as valid keys.  Both select the button.\n  //\n  if (SWM_INPUT_TYPE_KEY == pInputState->InputType) {\n    EFI_KEY_DATA  *pKey = &pInputState->State.KeyState;\n\n    if ((CHAR_CARRIAGE_RETURN == pKey->Key.UnicodeChar) || (L' ' == pKey->Key.UnicodeChar)) {\n      this->m_pButton->State = SELECT;\n      Context                = this->m_pSelectionContext;\n    } else {\n      // Unrecognized keyboard input - simply exit.\n      //\n      goto Exit;\n    }\n\n    // Draw the button.\n    //\n    RenderButton (\n      this,\n      DrawHighlight\n      );\n\n    // We're done, exit.\n    //\n    goto Exit;\n  }\n\n  // If there is touch input, check whether the pointer location falls within the button's bounding box.\n  //\n  if ((SWM_INPUT_TYPE_TOUCH == pInputState->InputType) &&\n      (pInputState->State.TouchState.CurrentX >= pRect->Left) && (pInputState->State.TouchState.CurrentX <= pRect->Right) &&\n      (pInputState->State.TouchState.CurrentY >= pRect->Top) && (pInputState->State.TouchState.CurrentY <= pRect->Bottom))\n  {\n    this->m_pButton->State = HOVER;\n    if (pInputState->State.TouchState.ActiveButtons & 0x1) {\n      this->m_ButtonDown = TRUE;\n    } else {\n      if (this->m_ButtonDown == TRUE) {\n        this->m_pButton->State = SELECT;\n        Context                = this->m_pSelectionContext;\n      }\n    }\n  } else {\n    if (KEYDEFAULT != this->m_pButton->State) {\n      this->m_pButton->State = NORMAL;\n    }\n\n    this->m_ButtonDown = FALSE;\n  }\n\n  // Draw the button.\n  //\n  RenderButton (\n    this,\n    DrawHighlight\n    );\n\nExit:\n  AuroraCanvasDiagnosticStage (184);\n\n  if (NULL != pSelectionContext) {\n    *pSelectionContext = Context;\n  }\n\n  return (this->m_pButton->State);\n}\n"
 BUTTON_DECLARATIONS = "// Shared hooks implemented in Canvas.c; callbacks remain NULL outside FrontPage.\nVOID AuroraCanvasDiagnosticStage (IN UINTN Stage);\nVOID AuroraCanvasDiagnosticResult (IN CONST CHAR8 *Operation, IN EFI_STATUS Status);\n\n"
 
-def transform(text, replacements, addition):
+SWM_ORIGINAL = "EFI_STATUS\nEFIAPI\nSWMStringToWindow (\n  IN        MS_SIMPLE_WINDOW_MANAGER_PROTOCOL  *This,\n  IN        EFI_HANDLE                         ImageHandle,\n  IN        EFI_HII_OUT_FLAGS                  Flags,\n  IN        EFI_STRING                         String,\n  IN        EFI_FONT_DISPLAY_INFO              *StringInfo,\n  IN OUT    EFI_IMAGE_OUTPUT                   **Blt,\n  IN        UINTN                              BltX,\n  IN        UINTN                              BltY,\n  OUT       EFI_HII_ROW_INFO                   **RowInfoArray OPTIONAL,\n  OUT       UINTN                              *RowInfoArraySize OPTIONAL,\n  OUT       UINTN                              *ColumnInfoArray OPTIONAL\n  )\n{\n  EFI_STATUS  Status = EFI_SUCCESS;\n\n  // Denote the start of surface updating.\n  //\n  mRenderingEngine->SetModeSurface (\n                      mRenderingEngine,\n                      ImageHandle,\n                      PAINT_BEGIN\n                      );\n\n  // Update the surface.\n  //\n  Status = mFont->StringToImage (\n                    mFont,\n                    Flags,\n                    String,\n                    StringInfo,\n                    Blt,\n                    BltX,\n                    BltY,\n                    RowInfoArray,\n                    RowInfoArraySize,\n                    ColumnInfoArray\n                    );\n\n  // Denote the end of surface updating.\n  //\n  mRenderingEngine->SetModeSurface (\n                      mRenderingEngine,\n                      ImageHandle,\n                      PAINT_END\n                      );\n\n  return Status;\n}\n"
+SWM_REPLACEMENT = "EFI_STATUS\nEFIAPI\nSWMStringToWindow (\n  IN        MS_SIMPLE_WINDOW_MANAGER_PROTOCOL  *This,\n  IN        EFI_HANDLE                         ImageHandle,\n  IN        EFI_HII_OUT_FLAGS                  Flags,\n  IN        EFI_STRING                         String,\n  IN        EFI_FONT_DISPLAY_INFO              *StringInfo,\n  IN OUT    EFI_IMAGE_OUTPUT                   **Blt,\n  IN        UINTN                              BltX,\n  IN        UINTN                              BltY,\n  OUT       EFI_HII_ROW_INFO                   **RowInfoArray OPTIONAL,\n  OUT       UINTN                              *RowInfoArraySize OPTIONAL,\n  OUT       UINTN                              *ColumnInfoArray OPTIONAL\n  )\n{\n  EFI_STATUS  Status = EFI_SUCCESS;\n  EFI_STATUS  DiagnosticStatus;\n  AURORA_STRING_DIAGNOSTIC_PROTOCOL *Diagnostic = NULL;\n\n  DiagnosticStatus = gBS->LocateProtocol (\n    &mAuroraStringDiagnosticGuid, NULL, (VOID **)&Diagnostic);\n  if (EFI_ERROR (DiagnosticStatus) || (Diagnostic == NULL) ||\n      (Diagnostic->Revision != AURORA_STRING_DIAGNOSTIC_REVISION) ||\n      (Diagnostic->IsArmed == NULL) || (Diagnostic->Stage == NULL) ||\n      (Diagnostic->Result == NULL) || !Diagnostic->IsArmed ()) {\n    Diagnostic = NULL;\n  }\n  if (Diagnostic != NULL) {\n    Diagnostic->Stage (271);\n  }\n\n  // Denote the start of surface updating.\n  //\n  DiagnosticStatus = mRenderingEngine->SetModeSurface (\n                      mRenderingEngine,\n                      ImageHandle,\n                      PAINT_BEGIN\n                      );\n\n  if (Diagnostic != NULL) {\n    Diagnostic->Result (\"PAINT BEGIN\", DiagnosticStatus);\n    Diagnostic->Stage (272);\n    Diagnostic->Stage (273);\n  }\n\n  // Update the surface.\n  //\n  Status = mFont->StringToImage (\n                    mFont,\n                    Flags,\n                    String,\n                    StringInfo,\n                    Blt,\n                    BltX,\n                    BltY,\n                    RowInfoArray,\n                    RowInfoArraySize,\n                    ColumnInfoArray\n                    );\n\n  if (Diagnostic != NULL) {\n    Diagnostic->Result (\"FONT STRING IMAGE\", Status);\n    Diagnostic->Stage (274);\n    Diagnostic->Stage (275);\n  }\n\n  // Denote the end of surface updating.\n  //\n  DiagnosticStatus = mRenderingEngine->SetModeSurface (\n                      mRenderingEngine,\n                      ImageHandle,\n                      PAINT_END\n                      );\n\n  if (Diagnostic != NULL) {\n    Diagnostic->Result (\"PAINT END\", DiagnosticStatus);\n    Diagnostic->Stage (276);\n  }\n  return Status;\n}\n"
+SWM_ADDITION = '#include "AuroraStringDiagnosticProtocol.h"\n'
+SWM_INCLUDE = '#include "WindowManager.h"\n'
+
+def transform(text, replacements, addition, include=INCLUDE):
     if all(text.count(new) == 1 for old, new in replacements) and text.count(addition) == 1:
         return text
-    if text.count(INCLUDE) != 1 or "AuroraCanvasDiagnostic" in text:
+    if text.count(include) != 1 or "AuroraCanvasDiagnostic" in text or "AuroraStringDiagnostic" in text:
         raise SystemExit("Toolkit source differs from expected diagnostic anchors")
     for old, new in replacements:
         if text.count(old) != 1:
             raise SystemExit("Toolkit source differs from expected diagnostic function")
         text = text.replace(old, new, 1)
-    return text.replace(INCLUDE, INCLUDE + "\n" + addition, 1)
+    return text.replace(include, include + "\n" + addition, 1)
 
 def main():
     actual = subprocess.check_output(
@@ -39,15 +44,19 @@ def main():
         raise SystemExit(f"Toolkit diagnostic requires mu_plus {PIN}, found {actual}")
     base = UPSTREAM / "MsGraphicsPkg/Library/SimpleUIToolKit"
     specifications = [
-        (base / "Canvas.c", [(CANVAS_ORIGINAL, CANVAS_REPLACEMENT)], CANVAS_HELPERS),
+        (base / "Canvas.c", [(CANVAS_ORIGINAL, CANVAS_REPLACEMENT)], CANVAS_HELPERS, INCLUDE),
         (base / "Button.c", [(BUTTON_RENDER_ORIGINAL, BUTTON_RENDER_REPLACEMENT),
-                           (BUTTON_DRAW_ORIGINAL, BUTTON_DRAW_REPLACEMENT)], BUTTON_DECLARATIONS),
+                           (BUTTON_DRAW_ORIGINAL, BUTTON_DRAW_REPLACEMENT)], BUTTON_DECLARATIONS, INCLUDE),
+        (UPSTREAM / "MsGraphicsPkg/SimpleWindowManagerDxe/SimpleWindowManagerProtocol.c",
+         [(SWM_ORIGINAL, SWM_REPLACEMENT)], SWM_ADDITION, SWM_INCLUDE),
     ]
-    pending = [(path, transform(path.read_text(encoding="utf-8"), replacements, addition))
-               for path, replacements, addition in specifications]
+    pending = [(path, transform(path.read_text(encoding="utf-8"), replacements, addition, include))
+               for path, replacements, addition, include in specifications]
+    header = (ROOT / "Platforms/SelunaPkg/FrontPage/AuroraStringDiagnosticProtocol.h").read_text(encoding="utf-8")
+    (UPSTREAM / "MsGraphicsPkg/SimpleWindowManagerDxe/AuroraStringDiagnosticProtocol.h").write_text(header, encoding="utf-8")
     for path, updated in pending:
         path.write_text(updated, encoding="utf-8")
-    print("PASS: pinned Canvas 171-178 and Button 181-184/201-217 diagnostic boundaries applied")
+    print("PASS: pinned Canvas/Button and StringToWindow 271-276 diagnostics applied")
 
 if __name__ == "__main__":
     main()
