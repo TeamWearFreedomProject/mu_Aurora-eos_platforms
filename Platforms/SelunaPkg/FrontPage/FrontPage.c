@@ -36,6 +36,7 @@
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/BaseLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/HiiLib.h>
 #include <Library/PrintLib.h>
@@ -64,6 +65,11 @@
 #define FP_OSK_WIDTH_PERCENT  75            // On-screen keyboard is 75% the width of the screen.
 
 STATIC UINTN mAuroraAuthStatusCode = 0;
+STATIC EFI_STATUS mAuroraInitialAuthStatus = EFI_SUCCESS;
+STATIC BOOLEAN mAuroraInitialAuthRecorded = FALSE;
+STATIC EFI_STATUS mAuroraLastUiCallStatus = EFI_SUCCESS;
+STATIC CONST CHAR8 *mAuroraLastUiCallName = "NOT RUN";
+STATIC BOOLEAN mAuroraLastUiCallRecorded = FALSE;
 
 UINTN       mCallbackKey;
 EFI_HANDLE  mImageHandle;
@@ -888,6 +894,8 @@ CreateTopMenu (
   //
   AuroraFrontPageStage (21);
   AuthStatus = GetAuthToken (NULL);
+  mAuroraInitialAuthStatus = AuthStatus;
+  mAuroraInitialAuthRecorded = TRUE;
   // Lower row is the return status class, not another execution stage.
   if (FeaturePcdGet (PcdAuroraFrontPageStageDiagnostic)) {
     switch (AuthStatus) {
@@ -1540,109 +1548,101 @@ ProcessBootNext (
   this is the platform reference part and can be customize.
 **/
 
+#include "AuroraDiagnosticText.h"
+
+VOID
+AuroraDiagnosticCallResult (
+  IN CONST CHAR8 *Operation,
+  IN EFI_STATUS Status
+  )
+{
+  if (FeaturePcdGet (PcdAuroraFrontPageStageDiagnostic)) {
+    mAuroraLastUiCallName = Operation;
+    mAuroraLastUiCallStatus = Status;
+    mAuroraLastUiCallRecorded = TRUE;
+    DEBUG ((DEBUG_INFO, "[Aurora UI call] %a returned %r\n", Operation, Status));
+  }
+}
+
 /**
-  Best-effort, font-independent stage marker for Aurora diagnostics.
-  Numbers use GOP rectangles, so HII fonts and the UI toolkit are not needed.
+  Best-effort readable diagnostic text, independent of the UI under test.
+  The boundary is displayed before its delay; a BEFORE label does not prove
+  the following call was entered. Exact initial auth status is retained.
 **/
 VOID
 AuroraFrontPageStage (
   IN UINTN Stage
   )
 {
-  STATIC CONST UINT8 Digits[10][7] = {
-    {14,17,19,21,25,17,14}, {4,12,4,4,4,4,14},
-    {14,17,1,2,4,8,31}, {30,1,1,14,1,1,30},
-    {2,6,10,18,31,2,2}, {31,16,16,30,1,1,30},
-    {14,16,16,30,17,17,14}, {31,1,2,4,8,8,8},
-    {14,17,17,14,17,17,14}, {14,17,17,15,1,1,14}
-  };
-  STATIC CONST UINT8 Colors[10][3] = {
-    {255,255,255}, {255,255,0}, {0,255,0}, {0,255,255},
-    {255,0,255}, {255,128,0}, {160,96,255}, {0,160,128},
-    {128,192,255}, {255,0,0}
-  };
-  EFI_GRAPHICS_OUTPUT_PROTOCOL  *Gop;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Ink = {0,0,0,0};
-  EFI_STATUS                   Status;
-  UINTN                        Width;
-  UINTN                        Height;
-  UINTN                        Scale;
-  UINTN                        X;
-  UINTN                        Y;
-  UINTN                        Count;
-  UINTN                        Index;
-  UINTN                        Digit;
-  UINTN                        Row;
-  UINTN                        Col;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL *Gop;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background = {32,16,8,0};
+  EFI_STATUS Status;
+  UINTN Width;
+  UINTN Height;
+  UINTN Scale;
+  UINTN X;
+  UINTN Y;
+  UINTN PanelWidth;
+  UINTN PanelHeight;
+  UINTN Index;
+  CONST CHAR8 *Operation = "SEE STAGE MAP";
+  CONST CHAR8 *Boundary = "LAST BOUNDARY";
+  CHAR8 StageLine[32];
+  CHAR8 HexLine[32];
+  CHAR8 CallLine[48];
+  CHAR8 CallHexLine[32];
 
-  if (!FeaturePcdGet (PcdAuroraFrontPageStageDiagnostic)) {
+  if (!FeaturePcdGet (PcdAuroraFrontPageStageDiagnostic) || (Stage < 1) || (Stage > 999)) {
     return;
   }
-
-  if ((Stage < 1) || (Stage > 999)) {
-    return;
+  for (Index = 0; Index < ARRAY_SIZE (mAuroraStageText); Index++) {
+    if (mAuroraStageText[Index].Stage == Stage) {
+      Operation = mAuroraStageText[Index].Operation;
+      Boundary = mAuroraStageText[Index].Boundary;
+      break;
+    }
   }
-
-  DEBUG ((DEBUG_INFO, "[Aurora FrontPage stage] %u\n", Stage));
+  DEBUG ((DEBUG_INFO, "[Aurora stage] %u %a %a\n", (UINT32)Stage, Operation, Boundary));
   Status = gBS->LocateProtocol (&gEfiGraphicsOutputProtocolGuid, NULL, (VOID **)&Gop);
   if (!EFI_ERROR (Status) && (Gop != NULL) && (Gop->Mode != NULL) && (Gop->Mode->Info != NULL)) {
-    Width  = Gop->Mode->Info->HorizontalResolution;
+    Width = Gop->Mode->Info->HorizontalResolution;
     Height = Gop->Mode->Info->VerticalResolution;
-    Scale  = MIN (Width, Height) / 48;
-    if (Scale != 0) {
-      Background.Red      = Colors[(Stage - 1) % 10][0];
-      Background.Green    = Colors[(Stage - 1) % 10][1];
-      Background.Blue     = Colors[(Stage - 1) % 10][2];
-      Background.Reserved = 0;
-      Status = Gop->Blt (
-                      Gop, &Background, EfiBltVideoFill, 0, 0,
-                      Width / 4, Height / 4,
-                      Width - (Width / 4) * 2, Height - (Height / 4) * 2, 0
-                      );
-      if (!EFI_ERROR (Status)) {
-        Count = (Stage >= 100) ? 3 : ((Stage >= 10) ? 2 : 1);
-        X = (Width - (Count * 6 - 1) * Scale) / 2;
-        Y = (mAuroraAuthStatusCode == 0) ? (Height - 7 * Scale) / 2 : Height / 2 - 11 * Scale;
-        for (Index = 0; Index < Count; Index++) {
-          if (Count == 3) {
-            Digit = (Index == 0) ? Stage / 100 : ((Index == 1) ? (Stage / 10) % 10 : Stage % 10);
-          } else {
-            Digit = (Count == 2) ? ((Index == 0) ? Stage / 10 : Stage % 10) : Stage;
-          }
-          for (Row = 0; Row < 7; Row++) {
-            for (Col = 0; Col < 5; Col++) {
-              if ((Digits[Digit][Row] & (1U << (4 - Col))) != 0) {
-                Gop->Blt (Gop, &Ink, EfiBltVideoFill, 0, 0,
-                          X + (Index * 6 + Col) * Scale, Y + Row * Scale,
-                          Scale, Scale, 0);
-              }
-            }
-          }
-        }
-        if (mAuroraAuthStatusCode != 0) {
-          // Two rows: execution stage above, auth return-status class below.
-          X = (Width - 11 * Scale) / 2;
-          Y = Height / 2 + Scale;
-          for (Index = 0; Index < 2; Index++) {
-            Digit = (Index == 0) ? mAuroraAuthStatusCode / 10 : mAuroraAuthStatusCode % 10;
-            for (Row = 0; Row < 7; Row++) {
-              for (Col = 0; Col < 5; Col++) {
-                if ((Digits[Digit][Row] & (1U << (4 - Col))) != 0) {
-                  Gop->Blt (Gop, &Ink, EfiBltVideoFill, 0, 0,
-                            X + (Index * 6 + Col) * Scale, Y + Row * Scale,
-                            Scale, Scale, 0);
-                }
-              }
-            }
-          }
+    if ((Width >= 96) && (Height >= 96)) {
+      X = Width / 6;
+      Y = Height / 6;
+      PanelWidth = Width - X * 2;
+      PanelHeight = Height - Y * 2;
+      Scale = MAX (1, MIN (Width, Height) / 144);
+      // Ten text rows inside the central diagnostic panel.
+      Scale = MIN (Scale, PanelHeight / 100);
+      if (Scale != 0) {
+        Status = Gop->Blt (Gop, &Background, EfiBltVideoFill, 0, 0,
+                           X, Y, PanelWidth, PanelHeight, 0);
+        if (!EFI_ERROR (Status)) {
+          AsciiSPrint (StageLine, sizeof (StageLine), "STAGE %u", (UINT32)Stage);
+          AsciiSPrint (CallLine, sizeof (CallLine), "UI %a", mAuroraLastUiCallName);
+          AsciiSPrint (CallHexLine, sizeof (CallHexLine), "%016LX", (UINT64)mAuroraLastUiCallStatus);
+          AsciiSPrint (HexLine, sizeof (HexLine), "%016LX", (UINT64)mAuroraInitialAuthStatus);
+          Y = Height / 2 - 50 * Scale;
+          AuroraDiagnosticTextLine (Gop, "AURORA DIAGNOSTIC", Width / 2, Y, PanelWidth - 16, Scale);
+          AuroraDiagnosticTextLine (Gop, StageLine, Width / 2, Y + 10 * Scale, PanelWidth - 16, Scale);
+          AuroraDiagnosticTextLine (Gop, Operation, Width / 2, Y + 20 * Scale, PanelWidth - 16, Scale);
+          AuroraDiagnosticTextLine (Gop, Boundary, Width / 2, Y + 30 * Scale, PanelWidth - 16, Scale);
+          AuroraDiagnosticTextLine (Gop, "AUTH RESULT", Width / 2, Y + 40 * Scale, PanelWidth - 16, Scale);
+          AuroraDiagnosticTextLine (Gop, mAuroraInitialAuthRecorded ? AuroraDiagnosticStatusName (mAuroraInitialAuthStatus) : "NOT RUN",
+                                    Width / 2, Y + 50 * Scale, PanelWidth - 16, Scale);
+          AuroraDiagnosticTextLine (Gop, mAuroraInitialAuthRecorded ? HexLine : "NOT RUN",
+                                    Width / 2, Y + 60 * Scale, PanelWidth - 16, Scale);
+          AuroraDiagnosticTextLine (Gop, CallLine, Width / 2, Y + 70 * Scale, PanelWidth - 16, Scale);
+          AuroraDiagnosticTextLine (Gop, mAuroraLastUiCallRecorded ? AuroraDiagnosticStatusName (mAuroraLastUiCallStatus) : "NOT RUN",
+                                    Width / 2, Y + 80 * Scale, PanelWidth - 16, Scale);
+          AuroraDiagnosticTextLine (Gop, mAuroraLastUiCallRecorded ? CallHexLine : "NOT RUN",
+                                    Width / 2, Y + 90 * Scale, PanelWidth - 16, Scale);
         }
       }
     }
   }
-
-  // This changes timing: record the last number, not only the last color.
-  // Stall uses a bounded busy delay rather than waiting for a UEFI timer event.
+  // Timing perturbation and marker drawing remain part of the observation.
   gBS->Stall (2000000);
 }
 

@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 // Linked only into diagnostic FrontPage; implementation is feature-gated.
 VOID AuroraFrontPageStage (IN UINTN Stage);
+VOID AuroraDiagnosticCallResult (IN CONST CHAR8 *Operation, IN EFI_STATUS Status);
 
 // *** Pre-processor Constants ***
 //
@@ -153,6 +154,7 @@ CreateDialogControls (
   )
 {
   EFI_STATUS     Status       = EFI_SUCCESS;
+  EFI_STATUS     DiagnosticCallStatus;
   UINT32         DialogOrigX  = DialogBounds.Left;
   UINT32         DialogOrigY  = DialogBounds.Top;
   UINT32         DialogWidth  = SWM_RECT_WIDTH (DialogBounds);
@@ -575,34 +577,46 @@ CreateDialogControls (
 
   // Add the control to the canvas.
   //
-  DialogCanvas->AddControl (
+  AuroraFrontPageStage (135);
+  DiagnosticCallStatus = DialogCanvas->AddControl (
                   DialogCanvas,
                   TRUE,                 // Highlightable.
                   FALSE,                // Not invisible.
                   (VOID *)CancelButton
                   );
 
+  AuroraDiagnosticCallResult ("ADD CANCEL", DiagnosticCallStatus);
+  AuroraFrontPageStage (136);
+
   // Denote the button as the default control (for key input if nothing is highlighted).
   //
-  DialogCanvas->SetDefaultControl (
+  AuroraFrontPageStage (137);
+  DiagnosticCallStatus = DialogCanvas->SetDefaultControl (
                   DialogCanvas,
                   (VOID *)OKButton
                   );
 
+  AuroraDiagnosticCallResult ("SET DEFAULT", DiagnosticCallStatus);
+  AuroraFrontPageStage (138);
+
   // Set keyboard input focus on the password editbox.
   //
+  AuroraFrontPageStage (139);
   if (Type == SWM_PWD_TYPE_SET_PASSWORD) {
-    DialogCanvas->SetHighlight (
+    DiagnosticCallStatus = DialogCanvas->SetHighlight (
                     DialogCanvas,
                     mNewPassword
                     );
   } else {
     // current password and alert password type
-    DialogCanvas->SetHighlight (
+    DiagnosticCallStatus = DialogCanvas->SetHighlight (
                     DialogCanvas,
                     mCurrentPassword
                     );
   }
+
+  AuroraDiagnosticCallResult ("SET HIGHLIGHT", DiagnosticCallStatus);
+  AuroraFrontPageStage (140);
 
   // Return the pointer to the canvas.
   //

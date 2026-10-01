@@ -21,6 +21,7 @@
 
 [Sources]
   FrontPage.c
+  AuroraDiagnosticText.h
   FrontPageConfigAccess.c
   FrontPageUi.c
   FrontPageStrings.uni

@@ -13,8 +13,8 @@ Pixel Watch 2 Wi-Fi（コードネーム **aurora**）向けの、実験中のUE
 | Aurora専用UEFIのコンパイル | GitHub Actionsで成功 |
 | CP2A由来のメモリ配置・CPU・タイマー・一部ACPI | 静的解析とCIで検査 |
 | 実機への一時起動 | 複数の候補が受理された。一時的なLoad Errorの原因は未確定 |
-| 実機の表示 | 番号付きFrontPage診断版で8まで表示され、そのまま残ったとの報告。メニューは未確認 |
-| USB | 以前の版では `045E:066B` を認識。最新の番号8到達時はUSB未認識との報告 |
+| 実機の表示 | 最新の数値診断で上段132・下段62が残ったとの報告。メニューは未確認 |
+| USB | 以前の版では `045E:066B` を認識。その後の診断版ではUSB未認識との報告 |
 | Mass Storage / Windows起動 | 未確認 |
 
 以前の**タイマー診断版**は、UEFI内部に残っていたWatch 3由来の割り込み番号をCP2AのDTBに合わせて修正したものです。[ビルド結果と成果物（Run 36560298201）](https://github.com/TeamWearFreedomProject/mu_Aurora-eos_platforms/actions/runs/36560298201)は成功していますが、実機では暗転と同じWinUSB認識が続きました。成功したビルドは実機での安全性や動作を保証しません。
@@ -34,12 +34,12 @@ Pixel Watch 2 Wi-Fi（コードネーム **aurora**）向けの、実験中のUE
 
 8の後の警告・認証・メニュー描画を細分した診断版は実機で23に到達し、その表示が残ったとの報告がありました。これは認証失敗の分岐を通った証拠で、パスワード設定や入力待ち到達の証拠ではありません。[細分番号の対応](Platforms/AuroraPkg/Research/frontpage_ui_substages_2026-10-01.md)を参照してください。現在は認証の返り値の分類を下段に表示し、パスワード画面の準備・描画・入力待ちを上段の数字で細分する診断版です。[2段表示と番号の対応](Platforms/AuroraPkg/Research/frontpage_password_status_2026-10-01.md)を参照してください。この版は実機で上段82・下段62が残ったとの報告がありました。初回認証がデバイスエラーを返し、画面のテーマ設定が戻ったことを示します。
 
-現在はパスワード画面の文字・入力欄・ボタン作成と枠描画を3桁の上段番号で細分した診断版です。[番号と観測方法](Platforms/AuroraPkg/Research/frontpage_password_controls_2026-10-01.md)を参照してください。成果物名は `aurora-CP2A-password-controls-diagnostic-UNVERIFIED` です。原因はまだ確定していません。
+現在はパスワード画面の文字・入力欄・ボタン作成と枠描画を3桁の上段番号で細分した診断版です。[番号と観測方法](Platforms/AuroraPkg/Research/frontpage_password_controls_2026-10-01.md)を参照してください。この版は実機で上段132・下段62が残ったとの報告がありました。現在は文字表示版で、処理名・呼び出し前後・初回認証と直近のUI処理の返り値を表示します。[文字表示と新しい境界番号](Platforms/AuroraPkg/Research/frontpage_text_diagnostic_2026-10-01.md)を参照してください。成果物名は `aurora-CP2A-text-diagnostic-UNVERIFIED` です。原因はまだ確定していません。
 
 ## 次に調べること
 
 1. 実機の現在のファームウェア・スロット・復旧手段を再確認する。
-2. 番号付き設定画面診断版を一時起動し、画面を動画で記録する。
+2. 文字表示診断版を一時起動し、約4分待って最後に残った番号・処理名・エラー名を記録する。動画は不要。
 3. 最後に見えた番号の前後にある処理を重点的に切り分ける。
 
 ## Linuxカーネル起動までの目標
