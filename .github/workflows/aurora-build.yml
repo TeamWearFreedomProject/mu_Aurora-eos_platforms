@@ -16,6 +16,8 @@ on:
       - 'build_bootshim_aurora.sh'
       - 'build_uefi_aurora.sh'
       - 'tools/validate_aurora_bootimg.py'
+      - 'tools/patch_aurora_canvas_diagnostic.py'
+      - 'tools/test_aurora_buffer_diagnostic.py'
       - 'tools/check_aurora_memorymap.py'
       - 'tools/test_aurora_memorymap.py'
       - 'tools/check_cp3a_target.py'
@@ -74,6 +76,7 @@ jobs:
           python3 -m unittest discover -s tools -p 'test_cp3a_runtime.py' -v
           python3 -m unittest discover -s tools -p 'test_aurora_memorymap.py' -v
           python3 -m unittest discover -s tools -p 'test_cp3a_target.py' -v
+          python3 -m unittest discover -s tools -p 'test_aurora_buffer_diagnostic.py' -v
 
       - name: Install host dependencies
         run: |
@@ -119,7 +122,7 @@ jobs:
       - name: Publish CP2A fastboot-format candidates (UNVERIFIED)
         uses: actions/upload-artifact@v4
         with:
-          name: aurora-CP2A-hii-font-diagnostic-UNVERIFIED
+          name: aurora-CP2A-hii-buffer-diagnostic-UNVERIFIED
           if-no-files-found: error
           compression-level: 3
           path: |
@@ -137,3 +140,4 @@ jobs:
             Build/BUILDLOG_AuroraPkg.txt
             Build/AuroraPkg/RELEASE_CLANGPDB/OVERRIDELOG.TXT
             Build/AuroraPkg/RELEASE_CLANGPDB/BUILD_TOOLS_REPORT/**
+

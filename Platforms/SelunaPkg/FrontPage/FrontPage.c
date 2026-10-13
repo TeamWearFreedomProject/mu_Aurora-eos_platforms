@@ -74,6 +74,12 @@ STATIC BOOLEAN mAuroraInitialAuthRecorded = FALSE;
 STATIC EFI_STATUS mAuroraLastUiCallStatus = EFI_SUCCESS;
 STATIC CONST CHAR8 *mAuroraLastUiCallName = "NOT RUN";
 STATIC BOOLEAN mAuroraLastUiCallRecorded = FALSE;
+STATIC BOOLEAN mAuroraBufferRecorded = FALSE;
+STATIC BOOLEAN mAuroraBufferAttempted = FALSE;
+STATIC UINTN mAuroraBufferWidth = 0;
+STATIC UINTN mAuroraBufferHeight = 0;
+STATIC UINTN mAuroraBufferBytes = 0;
+STATIC UINTN mAuroraBufferAddress = 0;
 
 UINTN       mCallbackKey;
 EFI_HANDLE  mImageHandle;
@@ -1577,11 +1583,32 @@ AuroraStringDiagnosticIsArmed (
   return mAuroraStringDiagnosticArmed;
 }
 
+STATIC
+VOID
+AuroraStringDiagnosticBuffer (
+  IN UINTN Width,
+  IN UINTN Height,
+  IN UINTN Bytes,
+  IN UINTN Address,
+  IN BOOLEAN Attempted
+  )
+{
+  mAuroraBufferWidth = Width;
+  mAuroraBufferHeight = Height;
+  mAuroraBufferBytes = Bytes;
+  mAuroraBufferAddress = Address;
+  mAuroraBufferAttempted = Attempted;
+  mAuroraBufferRecorded = TRUE;
+  DEBUG ((DEBUG_INFO, "[Aurora buffer] W=%Lu H=%Lu bytes=0x%LX address=0x%LX attempted=%u\n",
+          (UINT64)Width, (UINT64)Height, (UINT64)Bytes, (UINT64)Address, (UINT32)Attempted));
+}
+
 STATIC AURORA_STRING_DIAGNOSTIC_PROTOCOL mAuroraStringDiagnostic = {
   AURORA_STRING_DIAGNOSTIC_REVISION,
   AuroraStringDiagnosticIsArmed,
   AuroraFrontPageStage,
-  AuroraDiagnosticCallResult
+  AuroraDiagnosticCallResult,
+  AuroraStringDiagnosticBuffer
 };
 
 /**
@@ -1611,6 +1638,10 @@ AuroraFrontPageStage (
   CHAR8 HexLine[32];
   CHAR8 CallLine[48];
   CHAR8 CallHexLine[32];
+  CHAR8 BufferWidthLine[32];
+  CHAR8 BufferHeightLine[32];
+  CHAR8 BufferBytesLine[32];
+  CHAR8 BufferAddressLine[32];
 
   if (!FeaturePcdGet (PcdAuroraFrontPageStageDiagnostic) || (Stage < 1) || (Stage > 999)) {
     return;
@@ -1624,6 +1655,7 @@ AuroraFrontPageStage (
   }
   // Arm only the Button StringToWindow call, not earlier dialog text rendering.
   if (Stage == 214) {
+    mAuroraBufferRecorded = FALSE;
     mAuroraStringDiagnosticArmed = TRUE;
     if (mAuroraStringDiagnosticHandle == NULL) {
       Operation = "TRACE UNAVAILABLE";
@@ -1658,22 +1690,41 @@ AuroraFrontPageStage (
           AuroraDiagnosticTextLine (Gop, StageLine, Width / 2, Y + 10 * Scale, PanelWidth - 16, Scale);
           AuroraDiagnosticTextLine (Gop, Operation, Width / 2, Y + 20 * Scale, PanelWidth - 16, Scale);
           AuroraDiagnosticTextLine (Gop, Boundary, Width / 2, Y + 30 * Scale, PanelWidth - 16, Scale);
-          AuroraDiagnosticTextLine (Gop, "AUTH RESULT", Width / 2, Y + 40 * Scale, PanelWidth - 16, Scale);
-          AuroraDiagnosticTextLine (Gop, mAuroraInitialAuthRecorded ? AuroraDiagnosticStatusName (mAuroraInitialAuthStatus) : "NOT RUN",
-                                    Width / 2, Y + 50 * Scale, PanelWidth - 16, Scale);
-          AuroraDiagnosticTextLine (Gop, mAuroraInitialAuthRecorded ? HexLine : "NOT RUN",
-                                    Width / 2, Y + 60 * Scale, PanelWidth - 16, Scale);
-          AuroraDiagnosticTextLine (Gop, CallLine, Width / 2, Y + 70 * Scale, PanelWidth - 16, Scale);
-          AuroraDiagnosticTextLine (Gop, mAuroraLastUiCallRecorded ? AuroraDiagnosticStatusName (mAuroraLastUiCallStatus) : "NOT RUN",
-                                    Width / 2, Y + 80 * Scale, PanelWidth - 16, Scale);
-          AuroraDiagnosticTextLine (Gop, mAuroraLastUiCallRecorded ? CallHexLine : "NOT RUN",
-                                    Width / 2, Y + 90 * Scale, PanelWidth - 16, Scale);
+          if (mAuroraBufferRecorded && (Stage >= 300) && (Stage < 400)) {
+            AsciiSPrint (BufferWidthLine, sizeof (BufferWidthLine), "W %Lu", (UINT64)mAuroraBufferWidth);
+            AsciiSPrint (BufferHeightLine, sizeof (BufferHeightLine), "H %Lu", (UINT64)mAuroraBufferHeight);
+            AsciiSPrint (BufferBytesLine, sizeof (BufferBytesLine), "B %016LX", (UINT64)mAuroraBufferBytes);
+            AsciiSPrint (BufferAddressLine, sizeof (BufferAddressLine), "P %016LX", (UINT64)mAuroraBufferAddress);
+            AuroraDiagnosticTextLine (Gop, !mAuroraBufferAttempted ? "ALLOC NOT RUN" :
+                                      (mAuroraBufferAddress == 0 ? "ALLOC NULL" : "ALLOC OK"),
+                                      Width / 2, Y + 40 * Scale, PanelWidth - 16, Scale);
+            AuroraDiagnosticTextLine (Gop, BufferWidthLine, Width / 2, Y + 50 * Scale, PanelWidth - 16, Scale);
+            AuroraDiagnosticTextLine (Gop, BufferHeightLine, Width / 2, Y + 60 * Scale, PanelWidth - 16, Scale);
+            AuroraDiagnosticTextLine (Gop, BufferBytesLine, Width / 2, Y + 70 * Scale, PanelWidth - 16, Scale);
+            AuroraDiagnosticTextLine (Gop, BufferAddressLine, Width / 2, Y + 80 * Scale, PanelWidth - 16, Scale);
+            AuroraDiagnosticTextLine (Gop, "B P HEX VALUES", Width / 2, Y + 90 * Scale, PanelWidth - 16, Scale);
+          } else {
+            AuroraDiagnosticTextLine (Gop, "AUTH RESULT", Width / 2, Y + 40 * Scale, PanelWidth - 16, Scale);
+            AuroraDiagnosticTextLine (Gop, mAuroraInitialAuthRecorded ? AuroraDiagnosticStatusName (mAuroraInitialAuthStatus) : "NOT RUN",
+                                      Width / 2, Y + 50 * Scale, PanelWidth - 16, Scale);
+            AuroraDiagnosticTextLine (Gop, mAuroraInitialAuthRecorded ? HexLine : "NOT RUN",
+                                      Width / 2, Y + 60 * Scale, PanelWidth - 16, Scale);
+            AuroraDiagnosticTextLine (Gop, CallLine, Width / 2, Y + 70 * Scale, PanelWidth - 16, Scale);
+            AuroraDiagnosticTextLine (Gop, mAuroraLastUiCallRecorded ? AuroraDiagnosticStatusName (mAuroraLastUiCallStatus) : "NOT RUN",
+                                      Width / 2, Y + 80 * Scale, PanelWidth - 16, Scale);
+            AuroraDiagnosticTextLine (Gop, mAuroraLastUiCallRecorded ? CallHexLine : "NOT RUN",
+                                      Width / 2, Y + 90 * Scale, PanelWidth - 16, Scale);
+          }
         }
       }
     }
   }
   // Timing perturbation and marker drawing remain part of the observation.
   gBS->Stall (2000000);
+  if ((Stage == 339) || (Stage == 340)) {
+    // Keep a detected failure readable before normal cleanup replaces it.
+    gBS->Stall (28000000);
+  }
 }
 
 EFI_STATUS
@@ -2030,3 +2081,4 @@ GetAuthToken (
 
   return Status;
 }
+
