@@ -100,7 +100,7 @@ Use the nosb candidate with temporary `fastboot boot`; do not flash it.
 
 - [Microsoft mu_basecore Font.c at the pinned revision](https://github.com/microsoft/mu_basecore/blob/a18a672778fc28b2cf99642ca2571d3fdfef3ed3/MdeModulePkg/Universal/HiiDatabaseDxe/Font.c)
 - [Microsoft mu_plus at the pinned revision](https://github.com/microsoft/mu_plus/tree/2761c3a83e441f439fb3d90e61972801495b1196)
-- [Project credits](../../../../CREDITS.md)
+- [Project credits](../../../CREDITS.md)
 
 Original copyright/license notices are retained. The upstream projects do not
 guarantee this experimental Watch 2 port.
