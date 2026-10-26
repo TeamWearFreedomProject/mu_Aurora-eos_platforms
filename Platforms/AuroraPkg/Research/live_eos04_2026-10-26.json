@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "observed_on": "2026-10-26",
+  "source": "User-supplied running AsteroidOS FDT and pasted root /proc/iomem",
+  "dtb_sha256": "9d51a6d90d3b4c2c66dcd2e00faa1c80f27984a63031154e0a81be9fcd40072a",
+  "dtb_size_bytes": 335382,
+  "os": "AsteroidOS 2.2-nightly",
+  "build_id": "20261005064926",
+  "kernel": "5.15.144 aarch64",
+  "bootloader": "eos-0.4-11366482",
+  "slot": "a",
+  "model": "Google Aurora PVT 1.0",
+  "compatible": "qcom,monacop",
+  "compared_commit": "1430f5959220f1bb67d9fe748ef232296b296b5b",
+  "range_convention": "start inclusive, end exclusive",
+  "ram_banks": [
+    {
+      "start": "0x40000000",
+      "end": "0x7ee00000"
+    },
+    {
+      "start": "0x80000000",
+      "end": "0xc0000000"
+    }
+  ],
+  "fixed_regions": [
+    {
+      "node": "/reserved-memory/ramoops@61F00000",
+      "start": "0x61f00000",
+      "end": "0x62300000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/oda_region@45700000",
+      "start": "0x45700000",
+      "end": "0x45a00000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/deepsleep_region@45A00000",
+      "start": "0x45a00000",
+      "end": "0x45b00000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/hyp_region@45B00000",
+      "start": "0x45b00000",
+      "end": "0x45e00000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/xbl_aop_mem@45e00000",
+      "start": "0x45e00000",
+      "end": "0x45f1b000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/sec_apps_region@45fff000",
+      "start": "0x45fff000",
+      "end": "0x46000000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/smem@46000000",
+      "start": "0x46000000",
+      "end": "0x46200000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/wlan_msa_region@46200000",
+      "start": "0x46200000",
+      "end": "0x46300000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/modem_region@4ab00000",
+      "start": "0x4ab00000",
+      "end": "0x52900000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/stats_region@60000000",
+      "start": "0x60000000",
+      "end": "0x60100000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/removed_region@60100000",
+      "start": "0x60100000",
+      "end": "0x61f00000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/splash_region@5c000000",
+      "start": "0x5c000000",
+      "end": "0x5cf00000",
+      "no_map": false
+    },
+    {
+      "node": "/reserved-memory/dfps_data_region@5cf00000",
+      "start": "0x5cf00000",
+      "end": "0x5d000000",
+      "no_map": false
+    },
+    {
+      "node": "/reserved-memory/video_region@52900000",
+      "start": "0x52900000",
+      "end": "0x53000000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/adsp_regions@53000000",
+      "start": "0x53000000",
+      "end": "0x54900000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/ips_fw_region@54700000",
+      "start": "0x54900000",
+      "end": "0x54910000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/ipa_gsi_region@54710000",
+      "start": "0x54910000",
+      "end": "0x54915000",
+      "no_map": true
+    },
+    {
+      "node": "/reserved-memory/gpu_region@54715000",
+      "start": "0x54915000",
+      "end": "0x54917000",
+      "no_map": true
+    }
+  ],
+  "disabled_nodes_ignored": [
+    "/reserved-memory/video_region@50900000",
+    "/reserved-memory/adsp_regions@51000000",
+    "/reserved-memory/ips_fw_region@52900000",
+    "/reserved-memory/ipa_gsi_region@52910000",
+    "/reserved-memory/gpu_region@52915000",
+    "/reserved-memory/secure_display_region"
+  ],
+  "dynamic_pools_with_unresolved_addresses": [
+    {
+      "node": "/reserved-memory/mem_dump_region",
+      "size": 8388608
+    },
+    {
+      "node": "/reserved-memory/user_contig_region",
+      "size": 16777216
+    },
+    {
+      "node": "/reserved-memory/qseecom_region",
+      "size": 20971520
+    },
+    {
+      "node": "/reserved-memory/qseecom_ta_region",
+      "size": 16777216
+    },
+    {
+      "node": "/reserved-memory/non_secure_display_region",
+      "size": 171966464
+    },
+    {
+      "node": "/reserved-memory/adsp_region",
+      "size": 8388608
+    },
+    {
+      "node": "/reserved-memory/linux,cma",
+      "size": 33554432
+    }
+  ],
+  "allocatable_conflicts": [],
+  "allocatable_outside_ram": [],
+  "fixed_regions_not_reserved_by_uefi": [],
+  "uefi_relocation": {
+    "start": "0x5fc41000",
+    "end": "0x5ff00000",
+    "inside_linux_ram_bank": true,
+    "fixed_dt_overlap": false,
+    "iomem_containing_system_ram": "0x54917000..0x60000000",
+    "pre_linux_ownership_verified": false
+  },
+  "kinfo_note": "CP2A kinfo_mem 0x62400000..0x62401000 absent in this live DT; existing conservative UEFI reservation retained.",
+  "cpu_mpidrs": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "timer_ppi_numbers": [
+    1,
+    2,
+    3,
+    0
+  ],
+  "timer_gic_intids": [
+    17,
+    18,
+    19,
+    16
+  ],
+  "verdict": "NO_OBSERVED_STATIC_CONFLICTS; PRE_LINUX_OWNERSHIP_UNVERIFIED",
+  "hardware_boot_approved": false,
+  "hii_allocation_failure_confirmed": false
+}
